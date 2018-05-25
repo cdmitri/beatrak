@@ -184,14 +184,48 @@ const initEnv = () => {
 	console.log("log: beacon.js: initEnv(): gl.locpickGrpcHost = " + gl.locpickGrpcHost)
     }
 
+    if(typeof process.env.ELASTIC_PORT === 'undefined' || process.env.ELASTIC_PORT == "") {
+        gl.elasticPort = 50003
+        console.log("log: beacon.js: initEnv(): ELASTIC_PORT is undefined, gl.elasticPort = " + gl.elasticPort)
+    } else {
+        gl.elasticPort = process.env.ELASTIC_PORT
+        console.log("log: beacon.js: initEnv(): gl.elasticPort = " + gl.elasticPort)
+
+    if(typeof process.env.ELASTIC_HOST === 'undefined' || process.env.ELASTIC_HOST == "") {
+        gl.elasticHost = "localhost"
+        console.log("log: beacon.js: initEnv(): ELASTIC_HOST is undefined, gl.elasticHost = " + gl.elasticHost)
+    } else {
+        gl.elasticHost = process.env.elastic_HOST
+        console.log("log: beacon.js: initEnv(): gl.elasticHost = " + gl.elasticHost)
+    }
+
+    if(typeof process.env.STAGE1_PORT === 'undefined' || process.env.STAGE1_PORT == "") {
+        gl.stage1Port = 50006
+        console.log("log: beacon.js: initEnv(): STAGE1_PORT is undefined, gl.stage1Port = " + gl.stage1Port)
+    } else {
+        gl.stage1Port = process.env.STAGE1_PORT
+        console.log("log: beacon.js: initEnv(): gl.stage1Port = " + gl.stage1Port)
+    }
+    
+    if(typeof process.env.STAGE1_HOST === 'undefined' || process.env.STAGE1_HOST == "") {
+        gl.stage1Host = "localhost"
+        console.log("log: beacon.js: initEnv(): STAGE1_HOST is undefined, gl.stage1Host = " + gl.stage1Host)
+    } else {
+        gl.stage1Host = process.env.STAGE1_HOST
+        console.log("log: beacon.js: initEnv(): gl.stage1Host = " + gl.stage1Host)
+    }
+    
     gl.locpickHttpEndpoint = gl.locpickHttpHost + ":" + gl.locpickHttpPort
     console.log("log: beacon.js: initEnv(): gl.locpickHttpEndpoint = " + gl.locpickHttpEndpoint)
     gl.locpickGrpcEndpoint = gl.locpickGrpcHost + ":" + gl.locpickGrpcPort
     console.log("log: beacon.js: initEnv(): gl.locpickGrpcEndpoint = " + gl.locpickGrpcEndpoint)
     gl.locpickGrpcTlsEndpoint = gl.locpickGrpcHost + ":" + gl.locpickGrpcTlsPort
     console.log("log: beacon.js: initEnv(): gl.locpickGrpcTlsEndpoint = " + gl.locpickGrpcTlsEndpoint)
-
-
+    gl.elasticEndpoint = gl.elasticHost + ":" + gl.elasticPort
+    console.log("log: beacon.js: initEnv(): gl.elasticEndpoint = " + gl.elasticEndpoint)
+    gl.stage1Endpoint = gl.stage1Host + ":" + gl.stage1Port
+    console.log("log: beacon.js: initEnv(): gl.stage1Endpoint = " + gl.stage1Endpoint)
+    gl.stage1BaseURL = `http://${gl.stage1Endpoint}`
     //
     // TLS SECRETS
     //
@@ -529,7 +563,7 @@ const init_old = (async () => {
 
 
     elastic = new elasticsearch.Client({
-	host: common.HOST + ":" + common.ELASTIC_PORT,
+	host: gl.elasticEndpoint,
 	log: "error"
 	// log: LOG_LEVEL,
 	// pingTimeout: 1000,
