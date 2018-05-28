@@ -16,7 +16,9 @@ const log = require("loglevel")
 const getopt = require("node-getopt")
 const grpc = require("grpc")
 const fs = require("fs")
-const utils = require("../common/utils.js") 
+//const utils = require("../common/utils.js") 
+//../../../common
+const utils = require("../../../common/utils.js") 
 const m = utils.m;
  
 //
@@ -107,7 +109,7 @@ const initEnv = () => {
 
     if(typeof process.env.LOCPICK_GRPC_TLS_PORT === 'undefined' || process.env.LOCPICK_GRPC_TLS_PORT == "") {
 	gl.locpickGrpcTlsPort = 8090
-	console.log("log: locpick.js: initEnv(): LOCPICK_GRPC_TLS_PORT is undefined, gl.locpickGrpcTlsPort = " + gl.locpickGrpcPort)
+	console.log("log: locpick.js: initEnv(): LOCPICK_GRPC_TLS_PORT is undefined, gl.locpickGrpcTlsPort = " + gl.locpickGrpcTlsPort)
     } else {
 	gl.locpickGrpcTlsPort = process.env.LOCPICK_GRPC_TLS_PORT
 	console.log("log: locpick.js: initEnv(): gl.locpickGrpcTlsPort = " + gl.locpickGrpcTlsPort)
