@@ -5,7 +5,7 @@
  */
 
 
-"use strict";
+// "use strict";
   
 const express = require("express")
 const exec = require("child_process").exec
@@ -23,7 +23,9 @@ const m = utils.m;
 // GLOBAL
 //
 var gl = {}
-const PROTO_PATH = __dirname + "/../../../protos"
+
+// TODO: do a better PROTO_PATH of container vs. regular
+PROTO_PATH = __dirname + "/../../../protos"
 const KEY_PATH = __dirname + "/../../../keys"
 const locpickProto = grpc.load(PROTO_PATH+"/locpick.proto").locpick
  

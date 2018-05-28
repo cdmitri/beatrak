@@ -1,12 +1,13 @@
-FROM alpine:3.7
 #FROM alpine:3.6
+FROM alpine:3.7
 
-ENV VERSION=v8.11.2 NPM_VERSION=5 YARN_VERSION=latest
+#ENV VERSION=v8.11.2 NPM_VERSION=5 YARN_VERSION=latest
+ENV VERSION=v8.11.2 NPM_VERSION=6 YARN_VERSION=latest
 
 # For base builds
 #ENV CONFIG_FLAGS="--fully-static --without-npm" DEL_PKGS="libstdc++" RM_DIRS=/usr/include
 
-RUN apk add --no-cache curl make gcc g++ python linux-headers binutils-gold gnupg libstdc++ && \
+RUN apk add --no-cache git curl make gcc g++ python linux-headers binutils-gold gnupg libstdc++ && \
   gpg --keyserver ha.pool.sks-keyservers.net --recv-keys \
     94AE36675C464D64BAFA68DD7434390BDBE9B9C5 \
     FD3A5288F042B6850C66B31F09FE44734EB7990E \
@@ -38,8 +39,24 @@ RUN apk add --no-cache curl make gcc g++ python linux-headers binutils-gold gnup
       ln -s /usr/local/share/yarn/bin/yarnpkg /usr/local/bin/ && \
       rm ${YARN_VERSION}.tar.gz*; \
     fi; \
-  fi && \
-  apk del curl make gcc g++ python linux-headers binutils-gold gnupg ${DEL_PKGS} && \
-  rm -rf ${RM_DIRS} /node-${VERSION}* /usr/share/man /tmp/* /var/cache/apk/* \
-    /root/.npm /root/.node-gyp /root/.gnupg /usr/lib/node_modules/npm/man \
-    /usr/lib/node_modules/npm/doc /usr/lib/node_modules/npm/html /usr/lib/node_modules/npm/scripts
+  fi
+
+RUN npm config set unsafe-perm=true && \
+    npm install --global \
+        grpc \
+        nodemon \
+	nocache \
+        forever \
+        handlebars \
+        handlebars-intl \
+        yargs \
+	yarn \
+        dotenv
+
+#RUN apk del curl make gcc g++ python linux-headers binutils-gold gnupg ${DEL_PKGS} && \
+#      rm -rf ${RM_DIRS} /node-${VERSION}* /usr/share/man /tmp/* /var/cache/apk/* \
+#    /root/.npm /root/.node-gyp /root/.gnupg /usr/lib/node_modules/npm/man \
+#    /usr/lib/node_modules/npm/doc /usr/lib/node_modules/npm/html /usr/lib/node_modules/npm/scripts
+
+ENV PS1="[beatrak/alpine-node]# "
+ENV NODE_PATH=/usr/lib/node_modules

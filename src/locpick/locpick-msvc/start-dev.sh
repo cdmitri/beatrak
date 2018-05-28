@@ -1,4 +1,3 @@
 #!/bin/bash
-
-# npm install
+cd src/locpick/locpick-msvc/app
 nodemon server.js
