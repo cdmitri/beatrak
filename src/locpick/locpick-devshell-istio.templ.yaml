@@ -49,6 +49,8 @@ spec:
             path: {{ app-volume-path }}
         - name: common-volume
           hostPath:
+            path: {{ common-volume-path }}
+
       nodeSelector:
         kubernetes.io/hostname: {{ hostname }}
 

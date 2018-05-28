@@ -77,8 +77,8 @@ k8s-create-devshell: env
 k8s-create-devshell: LOG_LEVEL=error
 k8s-create-devshell: SERVICE_NAME=locpick-devshell
 k8s-create-devshell: APP=locpick-devshell
-k8s-create-devshell: APP_VOLUME_PATH=${ROOT_SRC_DIR}/locpick/locpick-msvc/app
-k8s-create-devshell: COMMON_VOLUME_PATH=${ROOT_SRC_DIR}/common
+k8s-create-devshell: APP_VOLUME_PATH=${ROOT_SRC_DIR}/src/locpick/locpick-msvc/app
+k8s-create-devshell: COMMON_VOLUME_PATH=${ROOT_SRC_DIR}/src/common
 k8s-create-devshell:
 	${ROOT_SRC_DIR}/tools/templ.js --templ=locpick-devshell-pod.templ.yaml --data='{ "service-name" : "${SERVICE_NAME}", "app" : "${APP}", "log-level" : "${LOG_LEVEL}", "hostname" : "${HOSTNAME}", "app-volume-path" : "${APP_VOLUME_PATH}", "common-volume-path" : "${COMMON_VOLUME_PATH}" }' --file=locpick-devshell-pod.yaml
 	kubectl create -f ./locpick-devshell-pod.yaml
@@ -91,8 +91,8 @@ k8s-create-devshell-istio: env
 k8s-create-devshell-istio: LOG_LEVEL=error
 k8s-create-devshell-istio: SERVICE_NAME=locpick-devshell
 k8s-create-devshell-istio: APP=locpick-devshell
-k8s-create-devshell-istio: APP_VOLUME_PATH=${ROOT_SRC_DIR}/locpick/locpick-msvc/app
-k8s-create-devshell-istio: COMMON_VOLUME_PATH=${ROOT_SRC_DIR}/common
+k8s-create-devshell-istio: APP_VOLUME_PATH=${ROOT_SRC_DIR}/src/locpick/locpick-msvc/app
+k8s-create-devshell-istio: COMMON_VOLUME_PATH=${ROOT_SRC_DIR}/src/common
 k8s-create-devshell-istio: 
 	${ROOT_SRC_DIR}/tools/templ.js --templ=locpick-devshell-istio.templ.yaml --data='{ "service-name" : "${SERVICE_NAME}", "app" : "${APP}", "log-level" : "${LOG_LEVEL}", "hostname" : "${HOSTNAME}", "app-volume-path" : "${APP_VOLUME_PATH}", "common-volume-path" : "${COMMON_VOLUME_PATH}" }' --file=locpick-devshell-istio.yaml
 	kubectl create -f ./locpick-devshell-istio.yaml
