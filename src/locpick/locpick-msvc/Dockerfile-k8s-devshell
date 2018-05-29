@@ -1,13 +1,17 @@
 FROM beatrak/node-base
 
+ENV PS1="[beatrak/locpick-devshell]# "
+
 RUN mkdir -p /root/beatrak
+
 WORKDIR /root/beatrak
 
 COPY ./waitloop.sh ./start-dev.sh /
 RUN chmod a+x /waitloop.sh && chmod a+x /start-dev.sh
 
+# not necessary to expose on k8s and istio
 EXPOSE 8080
+EXPOSE 8085
+EXPOSE 8090
+
 CMD ["/waitloop.sh"]
-
-
-

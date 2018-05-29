@@ -3,11 +3,18 @@
 # $ TARGET=devshell make
 
 env:
+ifndef HOSTNAME
+	$(eval export HOSTNAME=$(shell hostname))
+	@echo "HOSTNAME="${HOSTNAME}
+endif
+
 ifndef ROOT_SRC_DIR
-	$(eval ROOT_SRC_DIR=$(abspath ${PWD}/..))
+	$(eval ROOT_SRC_DIR=$(abspath ${PWD}/../..))
 	@echo "ROOT_SRC_DIR="${ROOT_SRC_DIR}
 endif
 	$(eval export NODE_PATH=/usr/lib/node_modules)
+	@echo "NODE_PATH="${NODE_PATH}
+
 ifndef TARGET
 TARGET = devshell
 endif
@@ -184,3 +191,24 @@ config-beacons:
 
 
 
+##
+## ISTIO
+##
+k8s-build-devshell-istio:
+	$(MAKE) -C ./beacon-msvc k8s-build-devshell
+
+k8s-create-devshell-istio: env
+k8s-create-devshell-istio: LOG_LEVEL=debug
+k8s-create-devshell-istio: SERVICE_NAME=beacon-devshell
+k8s-create-devshell-istio: APP=beacon-devshell
+k8s-create-devshell-istio: BEATRAK_VOLUME_PATH=${ROOT_SRC_DIR}
+k8s-create-devshell-istio: 
+	${ROOT_SRC_DIR}/tools/templ.js --templ=beacon-devshell-istio.templ.yaml --data='{ "service-name" : "${SERVICE_NAME}", "app" : "${APP}", "log-level" : "${LOG_LEVEL}", "hostname" : "${HOSTNAME}", "beatrak-volume-path" : "${BEATRAK_VOLUME_PATH}" }' --file=beacon-devshell-istio.yaml
+	kubectl create -f ./beacon-devshell-istio.yaml
+
+k8s-delete-devshell-istio: 
+	kubectl delete -f ./beacon-devshell-istio.yaml
+
+k8s-shell-devshell-istio: LOG_LEVEL=debug
+k8s-shell-devshell-istio:
+	kubectl exec -it $$(kubectl get pods -n default -o 'jsonpath={.items[?(@.metadata.labels.app=="beacon-devshell")].metadata.name}') -c beacon-devshell -- /bin/bash -l -c "LOG_LEVEL=$(LOG_LEVEL) exec -l /bin/bash"

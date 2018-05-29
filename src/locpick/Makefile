@@ -119,7 +119,7 @@ k8s-create-devshell-pod:
 k8s-delete-devshell-pod: 
 	kubectl delete -f ./locpick-devshell-pod.yaml
 
-k8s-delete-devshell: 
+k8s-delete-devshell-pod: 
 	kubectl delete -f ./locpick-devshell-pod.yaml
 
 # run [beatrak/locpick-devshell]# /start-dev.sh"
