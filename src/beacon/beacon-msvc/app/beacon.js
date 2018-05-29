@@ -289,8 +289,12 @@ const locpickHttpLoc = ( async(label) => {
     var loc
 
     // curl -XPUT locpick-dep-istio.default.svc.cluster.local:50001/za/locs?pretty
+    let url = "http://" + gl.locpickHttpEndpoint + "/" + gl.zone + "/locs"
+    log.debug(m("beacon.js: initHttpLoc(): locpick url = ", url))
+    
     await axhttp.put("http://" + gl.locpickHttpEndpoint + "/" + gl.zone + "/locs").then(response => {
-	log.debug(m("beacon.js: initHttpLoc(): locpick response.data =>\n"))
+	log.debug(m("beacon.js: initHttpLoc(): locpick gl.locpickHttpEndpoint = ", gl.locpickHttpEndpoint))
+	log.debug(m("beacon.js: initHttpLoc(): locpick PUT response.data =>\n"))
 	log.debug(JSON.stringify(response.data, null, "\t"));
 	log.debug(m("beacon.js: initHttpLoc(): locpick response.status = ", response.status))
 	log.debug(m("beacon.js: initHttpLoc(): locpick response.statusText = ", response.statusText));

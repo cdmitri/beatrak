@@ -17,5 +17,5 @@ test-api-locpick.bats.backup
 test-integration.sh.old
 beacon-v0.0.2
 locpick-v0.0.2
-
+elastic-envoy-dep-hlsvc.yaml.backup
 
