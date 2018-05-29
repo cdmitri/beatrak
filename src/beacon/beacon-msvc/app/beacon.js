@@ -151,6 +151,15 @@ const initEnv = () => {
 	console.log("log: beacon.js: initEnv(): gl.locpickHttpHost = " + gl.locpickHttpHost)
     }
     
+    if(typeof process.env.LOCPICK_GRPC_HOST === 'undefined' || process.env.LOCPICK_GRPC_HOST == "") {
+	// 	gl.locpickGrpcHost = "localhost"
+	gl.locpickGrpcHost = gl.locpickHttpHost
+	console.log("log: beacon.js: initEnv(): LOCPICK_GRPC_HOST is undefined, gl.locpickGrpcHost = " + gl.locpickGrpcHost)
+    } else {
+	gl.locpickGrpcHost = process.env.LOCPICK_GRPC_HOST
+	console.log("log: beacon.js: initEnv(): gl.locpickGrpcHost = " + gl.locpickGrpcHost)
+    }
+
     if(typeof process.env.LOCPICK_GRPC_PORT === 'undefined' || process.env.LOCPICK_GRPC_PORT == "") {
 	gl.locpickGrpcPort = 8085
 	console.log("log: beacon.js: initEnv(): LOCPICK_GRPC_PORT is undefined, gl.locpickGrpcPort = " + gl.locpickGrpcPort)
@@ -158,15 +167,6 @@ const initEnv = () => {
 	gl.locpickGrpcPort = process.env.LOCPICK_GRPC_PORT
 	console.log("log: beacon.js: initEnv(): gl.locpickGrpcPort = " + gl.locpickGrpcPort)
     }
-
-    if(typeof process.env.LOCPICK_GRPC_HOST === 'undefined' || process.env.LOCPICK_GRPC_HOST == "") {
-	gl.locpickGrpcHost = "localhost"
-	console.log("log: beacon.js: initEnv(): LOCPICK_GRPC_HOST is undefined, gl.gl.locpickGrpcHost = " + gl.gl.locpickGrpcHost)
-    } else {
-	gl.locpickGrpcHost = process.env.LOCPICK_GRPC_HOST
-	console.log("log: beacon.js: initEnv(): gl.locpickGrpcHost = " + gl.locpickGrpcHost)
-    }
-    
 
     if(typeof process.env.LOCPICK_GRPC_TLS_PORT === 'undefined' || process.env.LOCPICK_GRPC_TLS_PORT == "") {
 	gl.locpickGrpcTlsPort = 8090
@@ -176,21 +176,12 @@ const initEnv = () => {
 	console.log("log: beacon.js: initEnv(): gl.locpickGrpcTlsPort = " + gl.locpickGrpcTlsPort)
     }
     
-    if(typeof process.env.LOCPICK_GRPC_HOST === 'undefined' || process.env.LOCPICK_GRPC_HOST == "") {
-	gl.locpickGrpcHost = "localhost"
-	console.log("log: beacon.js: initEnv(): LOCPICK_GRPC_HOST is undefined, gl.locpickGrpcHost = " + gl.locpickGrpcHost)
-    } else {
-	gl.locpickGrpcHost = process.env.LOCPICK_GRPC_HOST
-	console.log("log: beacon.js: initEnv(): gl.locpickGrpcHost = " + gl.locpickGrpcHost)
-    }
-
     gl.locpickHttpEndpoint = gl.locpickHttpHost + ":" + gl.locpickHttpPort
     console.log("log: beacon.js: initEnv(): gl.locpickHttpEndpoint = " + gl.locpickHttpEndpoint)
     gl.locpickGrpcEndpoint = gl.locpickGrpcHost + ":" + gl.locpickGrpcPort
     console.log("log: beacon.js: initEnv(): gl.locpickGrpcEndpoint = " + gl.locpickGrpcEndpoint)
     gl.locpickGrpcTlsEndpoint = gl.locpickGrpcHost + ":" + gl.locpickGrpcTlsPort
     console.log("log: beacon.js: initEnv(): gl.locpickGrpcTlsEndpoint = " + gl.locpickGrpcTlsEndpoint)
-
 
     //
     // TLS SECRETS
@@ -220,10 +211,10 @@ const initEnv = () => {
 
     if(typeof process.env.LOCPICK_TLS_CLIENT_CERT === 'undefined' || process.env.LOCPICK_TLS_CLIENT_CERT == "" ) {
 	gl.locpickTlsClientCert = KEY_PATH + "/client1-cert.pem"
-	console.log("log: locpick.js: initEnv(): LOCPICK_TLS_CLIENT_CERT is undefined, gl.locpickTlsClientCert = ", gl.locpickTlsClientCert)
+	console.log("log: beacon.js: initEnv(): LOCPICK_TLS_CLIENT_CERT is undefined, gl.locpickTlsClientCert = ", gl.locpickTlsClientCert)
     } else {
 	gl.locpickTlsClientCert = process.env.LOCPICK_TLS_CLIENT_CERT
-	console.log("log: locpick.js: initEnv(): gl.locpickTlsClientCert = ", gl.locpickTlsClientCert)
+	console.log("log: beacon.js: initEnv(): gl.locpickTlsClientCert = ", gl.locpickTlsClientCert)
     }
     
 }
@@ -278,8 +269,8 @@ const locpickHttpInfo = ( async(label) => {
 	info = response.data
 
     }).catch(error => {
-	log.error(m("beacon.js: init(): locpick catch(): GET url = "), url);
-	log.error(m("beacon.js: init(): locpick catch(): could not call locpick, error.message = ", error.message));
+	log.error(m("beacon.js: initHttpInfo(): locpick catch(): GET url = "), url);
+	log.error(m("beacon.js: initHttpInfo(): locpick catch(): could not call locpick, error.message = ", error.message));
 	if(error.response) {
 	    log.error(m("beacon.js: init(): locpick catch(): error.response.data =>\n"));
 	    log.error(JSON.stringify(error.response.data, null, "\t"));
