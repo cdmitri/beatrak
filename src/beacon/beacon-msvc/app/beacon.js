@@ -272,11 +272,11 @@ const locpickHttpInfo = ( async(label) => {
 	log.error(m("beacon.js: initHttpInfo(): locpick catch(): GET url = "), url);
 	log.error(m("beacon.js: initHttpInfo(): locpick catch(): could not call locpick, error.message = ", error.message));
 	if(error.response) {
-	    log.error(m("beacon.js: init(): locpick catch(): error.response.data =>\n"));
+	    log.error(m("beacon.js: initHttpInfo(): locpick catch(): error.response.data =>\n"));
 	    log.error(JSON.stringify(error.response.data, null, "\t"));
-	    log.error(m("beacon.js: init(): locpick catch(): error.response.status = ", error.response.status));
+	    log.error(m("beacon.js: initHttpInfo(): locpick catch(): error.response.status = ", error.response.status));
 	 }
-	 log.debug(m("beacon.js: init(): locpick catch(): exit(1)"));
+	 log.debug(m("beacon.js: initHttpInfo(): locpick catch(): exit(1)"));
 	 process.exit(1)
     })
 
@@ -284,6 +284,34 @@ const locpickHttpInfo = ( async(label) => {
 
 })
 
+const locpickHttpLoc = ( async(label) => {
+
+    var loc
+
+    // curl -XPUT locpick-dep-istio.default.svc.cluster.local:50001/za/locs?pretty
+    await axhttp.put("http://" + gl.locpickHttpEndpoint + "/" + gl.zone + "/locs").then(response => {
+	log.debug(m("beacon.js: initHttpLoc(): locpick response.data =>\n"))
+	log.debug(JSON.stringify(response.data, null, "\t"));
+	log.debug(m("beacon.js: initHttpLoc(): locpick response.status = ", response.status))
+	log.debug(m("beacon.js: initHttpLoc(): locpick response.statusText = ", response.statusText));
+
+	loc = response.data
+
+    }).catch(error => {
+	log.error(m("beacon.js: initHttpLoc(): locpick catch(): GET url = "), url);
+	log.error(m("beacon.js: initHttpLoc(): locpick catch(): could not call locpick, error.message = ", error.message));
+	if(error.response) {
+	    log.error(m("beacon.js: initHttpLoc(): locpick catch(): error.response.data =>\n"));
+	    log.error(JSON.stringify(error.response.data, null, "\t"));
+	    log.error(m("beacon.js: initHttpLoc(): locpick catch(): error.response.status = ", error.response.status));
+	 }
+	 log.debug(m("beacon.js: initHttpLoc(): locpick catch(): exit(1)"));
+	 process.exit(1)
+    })
+
+    return loc
+
+})
 
 const locpickGrpcInfo = (label) => new Promise((resolve, reject) => {
     gl.locpickGrpcClient.info({ClientID: gl.sid, Label: label}, (error, response) => {
@@ -327,8 +355,29 @@ const getLoc = (zone, label) => new Promise((resolve, reject) => {
     } else {
 	log.warn(m("beacon.js: WARNING: getLoc(): combination of grpc and tls is not implemeted for getting location, deferring to plain HTTP"))
 	// TODO: do http call here
-	let loc = {"name" : "brussels", "lonlat" : "50.8386789,4.2931938", "zone" : "za"}
-	resolve(loc)
+	// let loc = {"name" : "brussels", "lonlat" : "50.8386789,4.2931938", "zone" : "za"}
+	// let loc = await locpickHttpInfo("http-info-for-beacon")
+	locpickHttpLoc("http-info-for-beacon").then(loc => {
+	    log.info(m("beacon.js: getLoc(): loc.loc[zone] = ", loc.loc["zone"]))
+	    if (loc.loc["zone"] === gl.zone) {
+		log.info(m("beacon.js: getLoc(): OK: locpick http loc"))
+		resolve(loc.loc)
+	    } else {
+		log.error(m("beacon.js: getLoc(): ERROR: locpick http loc"))
+		reject(m("beacon.js: getLoc(): ERROR: locpick http loc"))
+	    }
+	}, err => {
+	    reject(m("beacon.js: getLoc(): ERROR: locpick http loc, err = " + err))
+	})
+
+	// do not pretty the output
+//	log.debug(m("beacon.js: getLoc(): http loc = " + JSON.stringify(loc)))
+//	if (info.Name == "locpick") {
+//	    log.info(m("beacon.js: getLoc(): OK: locpick http loc"))
+//	} else {
+//	    log.error(m("beacon.js: getLoc(): ERROR: locpick http loc"))
+//	}
+//	resolve(loc)
     }
 }) // promise
 
@@ -376,23 +425,17 @@ const init = (async () => {
 	
     }
     
-
     initServers()
 
     const loc = await getLoc(gl.zone, "get-loc-from-beacon-test")
     log.debug(m("beacon.js: init(): loc = " + JSON.stringify(loc)))
-    if (loc.Name == "locpick") {
-	log.info(m("beacon.js: init(): OK: locpick location"))
-    } else {
-	log.info(m("beacon.js: init(): ERROR: locpick location"))
-    }
     
     // fill out the signal that we'll use later
     gl.sid = gl.serviceName.replace(/-/gi,"_") + "_" + Math.random().toString(36).substring(8) + "_" + ZONE
-    gl.signal.locpickid = info.locpickid
+    gl.signal.locpickid = loc.locpickid
     gl.signal.beaconid = gl.sid
-    gl.signal.beaconzone = ZONE
-    gl.signal.loc = info.loc
+    gl.signal.beaconzone = gl.zone
+    gl.signal.loc = loc
     log.debug(m("beacon.js: init(): gl.signal = " + JSON.stringify(gl.signal)))
 })
 
