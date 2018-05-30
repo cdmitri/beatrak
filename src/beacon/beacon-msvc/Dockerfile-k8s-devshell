@@ -6,7 +6,6 @@ RUN mkdir -p /root/beatrak
 
 WORKDIR /root/beatrak
 
-
 EXPOSE 8080
 
 # this we need to call with below and then run
