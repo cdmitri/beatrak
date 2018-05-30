@@ -195,6 +195,12 @@ config-beacons:
 ## ISTIO
 ##
 k8s-build-devshell-istio:
+	mkdir -p ./beacon-msvc/common/
+	cp -rf ../common/* ./beacon-msvc/common/
+	mkdir -p ./beacon-msvc/protos/
+	cp -rf ../protos/* ./beacon-msvc/protos/
+	mkdir -p ./beacon-msvc/keys/
+	cp -rf ../keys/* ./beacon-msvc/keys/
 	$(MAKE) -C ./beacon-msvc k8s-build-devshell
 
 k8s-create-devshell-istio: env
@@ -211,4 +217,10 @@ k8s-delete-devshell-istio:
 
 k8s-shell-devshell-istio: LOG_LEVEL=debug
 k8s-shell-devshell-istio:
+	mkdir -p ./beacon-msvc/common/
+	cp -rf ../common/* ./beacon-msvc/common/
+	mkdir -p ./beacon-msvc/protos/
+	cp -rf ../protos/* ./beacon-msvc/protos/
+	mkdir -p ./beacon-msvc/keys/
+	cp -rf ../keys/* ./beacon-msvc/keys/
 	kubectl exec -it $$(kubectl get pods -n default -o 'jsonpath={.items[?(@.metadata.labels.app=="beacon-devshell")].metadata.name}') -c beacon-devshell -- /bin/bash -l -c "LOG_LEVEL=$(LOG_LEVEL) exec -l /bin/bash"

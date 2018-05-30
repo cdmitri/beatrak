@@ -441,6 +441,150 @@ const init = (async () => {
     gl.signal.beaconzone = gl.zone
     gl.signal.loc = loc
     log.debug(m("beacon.js: init(): gl.signal = " + JSON.stringify(gl.signal)))
+
+
+    //
+    // ELASTIC
+    //
+
+    elastic = new elasticsearch.Client({
+	host: common.ELASTIC_HOST + ":" + common.ELASTIC_PORT,
+	log: "error"
+	// log: LOG_LEVEL,
+	// pingTimeout: 1000,
+	// requestTimeout: 1000, // when to report an error
+	// deadTimeout: 1000,
+	// maxRetries: 0 // this does work
+    });
+
+    let hasElastic = false;
+    while(!hasElastic) {
+	await elastic.ping({
+	    requestTimeout: 1000,
+	    maxRetries: 0 // control the retries in this loop
+	}).then(() => {
+	    log.debug(m("init(): elastic.ping(): success"));
+	    hasElastic = true;
+	}, (error) => {
+	    log.debug(m("init(): elastic.ping(): failed"));
+	});
+	await sleep(1000);
+    }
+
+    //
+    // create index (if necessary)
+    //
+    log.debug(m("init(): create /beacon index..."));
+    await elastic.indices.create({  
+	index: "beacon",
+	body: {
+	    "settings" : {
+		"number_of_shards" : 2,
+		"number_of_replicas" : 1
+	    },
+	    "mappings" : {
+		"explicit_types" : {
+		    "properties": {
+			"loc.name": {
+			    "type":"text",
+			    "fielddata":true
+			},
+			"beaconid": {
+			    "type":"text",
+			    "fielddata":true
+			}
+		    }
+		}
+	    }
+	}
+    })
+	.then((response,status) => {
+	    log.debug(m("init(): elastic.indices.create(): response =>"));
+	    log.debug(response);
+	    log.debug(m("init(): elastic.indices.create(): status =>"));
+	    log.debug(status);
+	}, error => {
+	    try {
+		if(typeof error.response === 'undefined') {
+		    log.debug(m("init(): elastic.indices.create(): got and undefined error.response"));
+		} else {
+		    JSON.parse(error.response);
+		    let response  = JSON.parse(error.response);
+		    if(response.error.type === "index_already_exists_exception") {
+			log.debug(m("init(): elastic.indices.create(): error(OK): index already exits, continue..."));
+		    } else {
+			log.debug(m("init(): elastic.indices.create(): error: got JSON response but unknown error.response =>"));
+			log.debug(error.response);
+		    }
+		}
+	    } catch (error) {
+		log.debug(m("init(): elastic.indices.create(): error: catch(): not a JSON error =>"));
+		log.debug(error);
+		log.debug(m("init(): elastic.indices.create(): error: catch(): this is a serious error, exit(1)"));
+		//process.exit(1);
+	    }
+	})
+	.catch (error => {
+	    log.debug(m("init(): elastic.indices.reate(): catch(): unkown general error =>"));
+	    log.debug(error);
+	});
+  
+    let record = {index: "beacon", type: "init"};
+    record.body = gl.signal;
+    record.body.timestamp = moment().format('YYYY-MM-DDTHH:mm:ssZ');
+    log.debug(m("init(): init record write: record = ", record));
+
+
+    //
+    // write init record
+    //
+    await elastic.index(record)
+	.then((response) => {
+	    log.debug(m("init(): elastic.index(): response =>"));
+	    log.debug(response);
+	}, error => {
+	    try {
+		// if the response not jason we'll be in catch
+		// JSON.parse(error); 
+		let response  = JSON.parse(error.response);
+		log.debug(m("init(): elastic.index(): error: got JSON response but unknown error =>"));
+		log.debug(error);
+		log.debug(m("init(): elastic.index(): error: this is a serious error, exit(1)"));
+		process.exit(1);
+	    } catch (error) {
+		log.debug(m("init(): elastic.index(): error: catch(): not a JSON error =>"));
+		log.debug(error);
+		log.debug(m("init(): elastic.index(): error: catch(): this is a serious error, exit(1)"));
+		process.exit(1);
+	    } 
+	})
+	.catch(error => {
+	    log.debug(m("init(): elastic.index(): catch(): unkown general error =>"));
+	    log.debug(error);
+	});
+
+    let ms = await expBackoff(1,1000); //sleep for 1000ms 
+
+    log.debug(m(`init(): waited for ${ms}(ms) before init finish`));   
+ 
+    // 
+    // STAGE1 init and stuff here
+    //
+    await pingStage1()
+    .then ((response) => {
+	log.debug(m("init(): OK: can reach stage1"));
+	log.debug(m("init(): OK: response =>"));
+	log.debug(response);
+	gl.doWriteStage1 = true;
+    })
+    .catch (error => {
+	log.error(m("init(): ERROR: can't reach stage1, error =>"));
+	log.error(error);
+	gl.doWriteStage1 = false;
+	//process.exit(1);
+    });
+
+    
 })
 
 const init_old_2 = (async () => {
@@ -567,7 +711,7 @@ const init_old = (async () => {
 
 
     elastic = new elasticsearch.Client({
-	host: common.HOST + ":" + common.ELASTIC_PORT,
+	host: common.ELASTIC_HOST + ":" + common.ELASTIC_PORT,
 	log: "error"
 	// log: LOG_LEVEL,
 	// pingTimeout: 1000,
@@ -816,9 +960,9 @@ const sendToStage1 = (baseURL, signal) => {
 		log.debug(error);
 //		log.debug(m("sendToStage1(): ERROR: error.response.data.error.error =>"));
 //		log.debug(error.response.data.error.error);  
-		if(typeof error.response.data === 'undefined') {
-		    log.debug(m("sendToStage1(): ERROR: envoy upstream must be done, reponse = " + response));
-		    reject("sendToStage1(): ERROR: evnoy upstream problem, response = " + response);
+		if(typeof error.response == 'undefined' || typeof error.response.data === 'undefined') {
+		    log.debug(m("sendToStage1(): ERROR: envoy upstream must be done, error.reponse = " + error.response));
+		    reject("sendToStage1(): ERROR: evnoy upstream problem, error.response = " + error.response);
 		} else {
 		    log.debug(m("sendToStage1(): ERROR: error.response.data =>"));
 		    log.debug(error.response.data);
@@ -889,13 +1033,143 @@ const main = (async () => {
 	    process.exit(1);
 	}) 
 
-    console.log("debug: beacon.js: main(): after init()")
-    
     log.info(m("beacon.js: main(): OK: init done"))
-    while(true) {
-	log.info(m("beacon.js: main(): sleeping..."));
+
+    let signalCount = -1;
+    let isElasticReady = false;
+    let doBackoff = false;
+    let record;
+    let stage1BackoffCount = 0;
+
+    log.debug(m(`init(): signal loop: starting loop: signalCount = ${signalCount}, BEACON_SIG_NUMBER = ${BEACON_SIG_NUMBER}, BEACON_SIG_PAUSE = ${BEACON_SIG_PAUSE}`));
+    //    while(true) {
+    //	log.info(m("beacon.js: main(): sleeping..."));
+    //	await sleep(BEACON_SIG_PAUSE);
+    //    }
+
+
+    //
+    // LOOP START
+    //
+
+    while(BEACON_SIG_NUMBER == -1 || signalCount++ < BEACON_SIG_NUMBER - 1) {
+	log.trace(m(`init(): signal loop: signalCount = ${signalCount}, BEACON_SIG_NUMBER = ${BEACON_SIG_NUMBER}, BEACON_SIG_PAUSE = ${BEACON_SIG_PAUSE}`));
+
+	if(doBackoff) {
+	    isElasticReady = false;
+	    let backoffCount = 1;
+	    let backoffMS = 0;
+	    while(!isElasticReady) {
+		log.debug(m(`signal loop: backoff loop: backoff for ${BEACON_BACKOFF_SLEEP}(ms)`));
+		await expBackoff(backoffCount, BEACON_BACKOFF_SLEEP)
+		.then((ms) => {
+		    log.debug(m("signal loop: backoff loop: expBackoff() done"));
+		    log.debug(m(`signal loop: backoff loop: expBackoff() waited for ${ms}(ms)`));
+		    // process.exit(1);
+		    backoffMS += ms;
+		})
+		.catch(error => {
+		    log.error(m("signal loop: backoff loop: expBackoff() error =>"));
+		    log.error(error);
+		    process.exit(1);
+		}); 
+
+		await elastic.ping({
+		    requestTimeout: 1000,
+		    maxRetries: 0 // control the retries in this loop
+		}).then(() => {
+		    log.debug(m("signal loop: backoff loop: elastic.ping(): success"));
+		    isElasticReady = true;
+		}, (error) => {
+		    log.debug(m("signal loop: backoff loop: elastic.ping(): failed"));
+		    isElasticReady = false;
+		});
+	    }
+
+	    // write a backoff record
+	    record = {index: "beacon", type: "backoff"};
+	    record.body = gl.signal;
+	    record.body.timestamp = moment().format('YYYY-MM-DDTHH:mm:ssZ');
+	    record.body.backoffSeconds = backoffMS / 1000;
+	    log.trace(m("signal loop: backoff record write: record = ", record));
+
+	    //
+	    // write backoff record
+	    //
+	    await elastic.index(record)
+		.then((response, status) => {
+		    log.debug(m("signal loop: OK: wrote backoff record: elastic.index(): response =>"));
+		    log.debug(response);
+		    log.debug(m("signal loop: OK: wrote backoff record: elastic.index.create(): status =>"));
+		    doBackoff = false;
+		})
+		.catch(error => {
+		    log.debug(m("signal loop: ERROR: couldn't write backoff record: elastic.index(): catch(): unkown general error =>"));
+		    log.debug(error);
+		    log.debug(m("signal loop: ERROR: couldn't write backoff record: elastic.index(): catch(): do backoff"));
+		    doBackoff = true;
+		});
+	} else {
+
+	    gl.signal.beacon_timestamp = moment().format('YYYY-MM-DDTHH:mm:ssZ');
+
+	    //
+	    // send signal to stage1
+	    //
+	    if(gl.doWriteStage1) {
+		await sendToStage1(gl.stage1BaseURL, gl.signal)
+		    .then(response => {
+		    })
+		    .catch(error => {
+			//log.debug(m("signal loop: ERROR: couldn't write stage1 record: catch(): unkown general error =>"));
+			log.debug(m(`signal loop: ERROR: couldn't write stage1 record: catch(): skip/backoff => ${gl.stage1BackoffNumber} cycles`));
+			//log.debug(error);
+			gl.doWriteStage1 = false;
+		    });
+	    } else {
+		    // log.debug(m("signal loop: ERROR: Stage1 is not reachable, skip."));
+		if(gl.stage1BackoffNumber > stage1BackoffCount) {
+		    stage1BackoffCount++;
+		    //log.debug(m(`signal loop: ERROR: gl.stage1BackoffNumber = ${gl.stage1BackoffNumber}`));
+		    //log.debug(m(`signal loop: ERROR: stage1BackoffCount = ${stage1BackoffCount}`));
+		} else {
+		    stage1BackoffCount = 0;
+		    gl.doWriteStage1 = true;
+		}
+	    }
+
+	    //
+	    // write signal record
+	    //
+	    gl.signal.timestamp = gl.signal.beacon_timestamp;
+	    record = {index: "beacon", type: "signal"};
+	    record.body = gl.signal;
+	    log.trace(m("signal loop: signal record write: record = ", record));
+	    await elastic.index(record)
+		.then((response) => {
+		    log.trace(m("signal loop: OK: elastic.index(): wrote /beacon/signal record"));
+		    log.trace(m("signal loop: elastic.index(): response =>"));
+		    log.trace(response);
+		    doBackoff = false;
+		})
+		.catch(error => {
+		    log.debug(m("signal loop: ERROR: elastic.index(): catch(): could not write /beacon/signal record"));
+		    log.debug(m("signal loop: ERROR: elastic.index(): catch(): unkown general error =>"));
+		    log.debug(error);
+		    log.debug(m("signal loop: elastic.index(): catch(): do backoff"));
+		    doBackoff = true;
+		})
+	}
 	await sleep(BEACON_SIG_PAUSE);
     }
+
+    //
+    // LOOP END
+    //    
+
+
+
+
 
     log.info(m("beacon.js: main(): done"))
     

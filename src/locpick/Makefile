@@ -151,6 +151,12 @@ k8s-shell-devshell-pod:
 ## ISTIO
 ##
 k8s-build-devshell-istio:
+	sudo mkdir -p ./locpick-msvc/common/
+	sudo cp -rf ../common/* ./locpick-msvc/common/
+	sudo mkdir -p ./locpick-msvc/protos/
+	sudo cp -rf ../protos/* ./locpick-msvc/protos/
+	sudo mkdir -p ./locpick-msvc/keys/
+	sudo cp -rf ../keys/* ./locpick-msvc/keys/
 	$(MAKE) -C ./locpick-msvc k8s-build-devshell
 
 
