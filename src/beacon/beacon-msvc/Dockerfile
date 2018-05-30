@@ -1,24 +1,31 @@
 FROM beatrak/node-base
+FROM beatrak/node-base
 
-ENV PS1="[beatrak/beacon]# "
+RUN mkdir -p /root/beatrak/src/beacon/beacon-msvc/app
+ADD ./app /root/beatrak/src/beacon/beacon-msvc/app
 
-RUN mkdir -p /root/app
-RUN mkdir -p /root/common
+# we have to do a bit of juggling here beacuase
+# we can't do ../../common in docker
+RUN mkdir -p /root/beatrak/src/common
+ADD ./common /root/beatrak/src/common
 
-WORKDIR /root/app
+RUN mkdir -p /root/beatrak/src/protos
+ADD ./protos /root/beatrak/src/protos
 
-COPY ./app/* /root/app/
-COPY ./common/* /root/common/
+RUN mkdir -p /root/beatrak/src/keys
+ADD ./keys /root/beatrak/src/keys
 
-WORKDIR /root/common
-RUN npm install
+WORKDIR /root/beatrak/src/beacon/beacon-msvc/app
 
-WORKDIR /root/app
-RUN npm install
+COPY ./waitloop.sh ./start-dev.sh /
+RUN chmod a+x /waitloop.sh && chmod a+x /start-dev.sh
 
+# http
 EXPOSE 8080
+# grpc
+EXPOSE 8085
+# grpc tls
+EXPOSE 8090
+#CMD ["/waitloop.sh"]
 
 CMD ["npm", "start"]
-
-
-

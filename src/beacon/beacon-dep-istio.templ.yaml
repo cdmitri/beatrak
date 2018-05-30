@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: Service
+metadata:
+    name: "{{ service-name }}"
+    labels:
+      app: "{{ app }}"
+spec:
+  ports:
+  - name: locpick-api
+    port: 50002
+    protocol: TCP
+    targetPort: 50002
+  - name: grpc
+    port: 51002
+    protocol: TCP
+    targetPort: 51001
+  - name: grpc-tls
+    port: 52002
+    protocol: TCP
+    targetPort: 52002
+  clusterIP:  None
+  selector:
+    app: "{{ app }}"
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: "{{ service-name }}"
+spec:
+  replicas: {{ replicas }}
+  template:
+    metadata:
+      labels:
+        app: "{{ app }}"
+    spec:
+      containers:
+      - name: beacon
+        image: beatrak/beacon
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: "LOG_LEVEL"
+          value: "{{ log-level }}"
+        - name: "SERVICE_NAME"
+          value: "{{ service-name }}"
+        - name: "ZONE"
+          value: "{{ zone }}"
+        - name: "BEACON_SIG_NUMBER"
+          value: "{{ beacon-sig-number }}"
+        - name: "BEACON_SIG_PS"
+          value: "{{ beacon-sig-ps }}"

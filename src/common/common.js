@@ -4,9 +4,10 @@ const LOCPICK_DEVSHELL_PORT = 55001
 const BEACON_PORT = 50002
 const BEACON_DEVSHELL_PORT = 55002
 
-const ELASTIC_PORT = 50003
 const ELASTIC_HOST = "elastic-envoy-dep-hlsvc.default.svc.cluster.local"
+const ELASTIC_PORT = 50003
 
+const POSTGRESQL_HOST = "postgresql-dep-svc.default.svc.cluster.local"
 const POSTGRESQL_PORT = 50005
 
 const STAGE1_PORT = 50006
