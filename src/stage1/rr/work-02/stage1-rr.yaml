@@ -1,0 +1,13 @@
+apiVersion: config.istio.io/v1alpha2
+kind: RouteRule
+metadata:
+  name: stage1-rr
+spec:
+  destination:
+    name: stage1-dep-istio
+  precedence: 1
+  route:
+  - labels:
+      version: v1
+      cluster: prem-1
+      zone: zp
