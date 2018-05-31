@@ -1,5 +1,4 @@
 FROM beatrak/node-base
-FROM beatrak/node-base
 
 RUN mkdir -p /root/beatrak/src/beacon/beacon-msvc/app
 ADD ./app /root/beatrak/src/beacon/beacon-msvc/app

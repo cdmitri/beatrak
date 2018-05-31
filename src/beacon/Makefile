@@ -206,17 +206,18 @@ k8s-build-devshell-istio:
 
 k8s-create-devshell-istio: env
 k8s-create-devshell-istio: LOG_LEVEL=debug
-k8s-create-devshell-istio: SERVICE_NAME=beacon-devshell
-k8s-create-devshell-istio: APP=beacon-devshell
+k8s-create-devshell-istio: SERVICE_NAME=beacon-devshell-istio
+k8s-create-devshell-istio: APP=${SERVICE_NAME}
 k8s-create-devshell-istio: BEATRAK_VOLUME_PATH=${ROOT_SRC_DIR}
 k8s-create-devshell-istio: 
-	${ROOT_SRC_DIR}/tools/templ.js --templ=beacon-devshell-istio.templ.yaml --data='{ "service-name" : "${SERVICE_NAME}", "app" : "${APP}", "log-level" : "${LOG_LEVEL}", "hostname" : "${HOSTNAME}", "beatrak-volume-path" : "${BEATRAK_VOLUME_PATH}" }' --file=beacon-devshell-istio.yaml
+	${ROOT_SRC_DIR}/tools/templ.js --templ=${SERVICE_NAME}.templ.yaml --data='{ "service-name" : "${SERVICE_NAME}", "app" : "${APP}", "log-level" : "${LOG_LEVEL}", "hostname" : "${HOSTNAME}", "beatrak-volume-path" : "${BEATRAK_VOLUME_PATH}" }' --file=beacon-devshell-istio.yaml
 	kubectl create -f ./beacon-devshell-istio.yaml
 
 k8s-delete-devshell-istio: 
 	kubectl delete -f ./beacon-devshell-istio.yaml
 
 k8s-shell-devshell-istio: LOG_LEVEL=debug
+k8s-shell-devshell-istio: SERVICE_NAME=beacon-devshell-istio
 k8s-shell-devshell-istio:
 	mkdir -p ./beacon-msvc/common/
 	cp -rf ../common/* ./beacon-msvc/common/
@@ -224,7 +225,7 @@ k8s-shell-devshell-istio:
 	cp -rf ../protos/* ./beacon-msvc/protos/
 	mkdir -p ./beacon-msvc/keys/
 	cp -rf ../keys/* ./beacon-msvc/keys/
-	kubectl exec -it $$(kubectl get pods -n default -o 'jsonpath={.items[?(@.metadata.labels.app=="beacon-devshell")].metadata.name}') -c beacon-devshell -- /bin/bash -l -c "LOG_LEVEL=$(LOG_LEVEL) exec -l /bin/bash"
+	kubectl exec -it $$(kubectl get pods -n default -o 'jsonpath={.items[?(@.metadata.labels.app=="beacon-devshell-istio")].metadata.name}') -c ${SERVICE_NAME} -- /bin/bash -l -c "LOG_LEVEL=$(LOG_LEVEL) exec -l /bin/bash"
 
 ##
 ## BEACON-PROD

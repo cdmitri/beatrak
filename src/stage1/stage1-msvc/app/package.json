@@ -11,7 +11,7 @@
     "testEnvironment": "node"
   },
   "scripts": {
-    "start": "node server.js",
+    "start": "node stage1.js",
     "test": "jest --watchAll",
     "dev": "/start-dev.sh"
   },

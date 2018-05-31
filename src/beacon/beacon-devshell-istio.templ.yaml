@@ -36,10 +36,7 @@ spec:
       containers:
       - name: "{{ service-name }}"
         image: beatrak/beacon-devshell
-        resources:
-          requests:
-            cpu: "100m"
-        imagePullPolicy: IfNotPresent #Always
+        imagePullPolicy: IfNotPresent
         env:
           - name: "LOG_LEVEL"
             value: "{{ log-level }}"

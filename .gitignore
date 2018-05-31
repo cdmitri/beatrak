@@ -21,3 +21,7 @@ elastic-envoy-dep-hlsvc.yaml.backup
 src/grafana/var-lib-grafana-volume/grafana.db
 src/beacon/beacon-msvc/protos/
 src/beacon/beacon-istio-za-dep-istio.yaml
+stage1-dep-istio-prem-1.yaml
+stage1-dep-istio.yaml
+stage1-devshell-istio.yaml
+stage1-msvc/protos/

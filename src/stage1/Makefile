@@ -1,9 +1,15 @@
 env:
+ifndef HOSTNAME
+	$(eval export HOSTNAME=$(shell hostname))
+	@echo "HOSTNAME="${HOSTNAME}
+endif
+
 ifndef ROOT_SRC_DIR
-	$(eval ROOT_SRC_DIR=$(abspath ${PWD}/..))
+	$(eval ROOT_SRC_DIR=$(abspath ${PWD}/../..))
 	@echo "ROOT_SRC_DIR="${ROOT_SRC_DIR}
 endif
 	$(eval export NODE_PATH=/usr/lib/node_modules)
+	@echo "NODE_PATH="${NODE_PATH}
 ifndef TARGET
 TARGET = devshell
 endif
@@ -143,6 +149,85 @@ k8s-shell-stage1-clb: SERVICE_NAME=stage1-clb-ss-hlsvc
 k8s-shell-stage1-clb: LOG_LEVEL=debug
 k8s-shell-stage1-clb:
 	kubectl exec ${SERVICE_NAME}-0 --container stage1 -i -t -- /bin/bash -l -c "LOG_LEVEL=$(LOG_LEVEL) exec -l /bin/bash"
+
+
+##
+## ISTIO
+##
+k8s-build-devshell-istio:
+	mkdir -p ./stage1-msvc/common/
+	cp -rf ../common/* ./stage1-msvc/common/
+	mkdir -p ./stage1-msvc/protos/
+	cp -rf ../protos/* ./stage1-msvc/protos/
+	mkdir -p ./stage1-msvc/keys/
+	cp -rf ../keys/* ./stage1-msvc/keys/
+	$(MAKE) -C ./stage1-msvc k8s-build-devshell
+
+k8s-create-devshell-istio: env 
+k8s-create-devshell-istio: LOG_LEVEL=debug
+k8s-create-devshell-istio: REPLICAS=1
+k8s-create-devshell-istio: SERVICE_NAME=stage1-devshell-istio
+k8s-create-devshell-istio: APP=${SERVICE_NAME}
+k8s-create-devshell-istio: ZONE=zdevshell
+k8s-create-devshell-istio: CLUSTER=cla
+k8s-create-devshell-istio: BEATRAK_VOLUME_PATH=${ROOT_SRC_DIR}
+k8s-create-devshell-istio: 
+	${ROOT_SRC_DIR}/tools/templ.js --templ=${SERVICE_NAME}.templ.yaml --data='{ "service-name" : "$(SERVICE_NAME)", "app" : "${APP}", "zone" : "${ZONE}", "cluster" : "$(CLUSTER)", "log-level" : "$(LOG_LEVEL)", "replicas" : "${REPLICAS}", "hostname" : "${HOSTNAME}", "beatrak-volume-path" : "${BEATRAK_VOLUME_PATH}" }' --file=${SERVICE_NAME}.yaml
+	kubectl create -f ./${SERVICE_NAME}.yaml
+
+k8s-delete-devshell-istio: SERVICE_NAME=stage1-devshell-istio
+k8s-delete-devshell-istio:
+	kubectl delete -f ${SERVICE_NAME}.yaml
+
+k8s-shell-devshell-istio: LOG_LEVEL=debug
+k8s-shell-devshell-istio: SERVICE_NAME=stage1-devshell-istio
+k8s-shell-devshell-istio:
+	mkdir -p ./stage1-msvc/common/
+	cp -rf ../common/* ./stage1-msvc/common/
+	mkdir -p ./stage1-msvc/protos/
+	cp -rf ../protos/* ./stage1-msvc/protos/
+	mkdir -p ./stage1-msvc/keys/
+	cp -rf ../keys/* ./stage1-msvc/keys/
+	cd ./stage1-msvc/app; yarn
+	kubectl exec -it $$(kubectl get pods -n default -o 'jsonpath={.items[?(@.metadata.labels.app=="stage1-devshell-istio")].metadata.name}') -c ${SERVICE_NAME} -- /bin/bash -l -c "LOG_LEVEL=$(LOG_LEVEL) exec -l /bin/bash"
+
+
+##
+## ISTIO STAGE1-PREM-1, PREM-2, CLOUD-1
+##
+k8s-build-stage1-istio-prem-1:
+	mkdir -p ./stage1-msvc/common/
+	cp -rf ../common/* ./stage1-msvc/common/
+	mkdir -p ./stage1-msvc/protos/
+	cp -rf ../protos/* ./stage1-msvc/protos/
+	mkdir -p ./stage1-msvc/keys/
+	cp -rf ../keys/* ./stage1-msvc/keys/
+	$(MAKE) -C ./stage1-msvc k8s-build
+
+k8s-create-stage1-istio-prem-1: env
+k8s-create-stage1-istio-prem-1: SERVICE_NAME=stage1-dep-istio
+k8s-create-stage1-istio-prem-1: APP=${SERVICE_NAME}
+k8s-create-stage1-istio-prem-1: REPLICAS=1
+k8s-create-stage1-istio-prem-1: LOG_LEVEL=debug
+k8s-create-stage1-istio-prem-1: CLUSTER=prem-1
+k8s-create-stage1-istio-prem-1: ZONE=nozone
+k8s-create-stage1-istio-prem-1: 
+	${ROOT_SRC_DIR}/tools/templ.js --templ=stage1-dep-istio.templ.yaml --data='{ "service-name" : "$(SERVICE_NAME)", "cluster" : "$(CLUSTER)", "zone" : "$(ZONE)", "replicas" : "$(REPLICAS)", "log-level" : "${LOG_LEVEL}", "app" : "${APP}", "cluster" : "${CLUSTER}",   "hostname" : "${HOSTNAME}"}' --file=${SERVICE_NAME}.yaml
+	kubectl create -f ./${SERVICE_NAME}.yaml
+
+k8s-delete-stage1-istio-prem-1: SERVICE_NAME=stage1-dep-istio
+k8s-delete-stage1-istio-prem-1:
+	kubectl delete -f ${SERVICE_NAME}.yaml
+
+
+
+
+
+
+
+
+
+
 
 
 
