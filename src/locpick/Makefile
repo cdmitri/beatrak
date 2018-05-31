@@ -160,7 +160,7 @@ k8s-build-devshell-istio:
 	$(MAKE) -C ./locpick-msvc k8s-build-devshell
 
 
-k8s-build-prod-istio:
+k8s-build-locpick-istio:
 	sudo mkdir -p ./locpick-msvc/common/
 	sudo cp -rf ../common/* ./locpick-msvc/common/
 	sudo mkdir -p ./locpick-msvc/protos/
@@ -170,17 +170,18 @@ k8s-build-prod-istio:
 	$(MAKE) -C ./locpick-msvc k8s-build
 
 
-k8s-create-prod-istio: env
-k8s-create-prod-istio: REPLICAS=1
-k8s-create-prod-istio: LOG_LEVEL=error
-k8s-create-prod-istio: SERVICE_NAME=locpick-dep-istio
-k8s-create-prod-istio: APP=locpick-dep-istio
-k8s-create-prod-istio:
+k8s-create-locpick-istio: env
+k8s-create-locpick-istio: REPLICAS=1
+k8s-create-locpick-istio: LOG_LEVEL=error
+k8s-create-locpick-istio: SERVICE_NAME=locpick-dep-istio
+k8s-create-locpick-istio: APP=${SERVICE_NAME}
+k8s-create-locpick-istio:
 	${ROOT_SRC_DIR}/tools/templ.js --templ=locpick-dep-istio.templ.yaml --data='{ "service-name" : "${SERVICE_NAME}", "app" : "${APP}", "log-level" : "${LOG_LEVEL}", "replicas" : ${REPLICAS} }' --file=locpick-dep-istio.yaml
-	kubectl create -f ./locpick-dep-istio.yaml
+	kubectl create -f ./${SERVICE_NAME}.yaml
 
-k8s-delete-prod-istio:
-	kubectl delete -f ./locpick-dep-istio.yaml
+k8s-create-locpick-istio: SERVICE_NAME=locpick-dep-istio
+k8s-delete-locpick-istio:
+	kubectl delete -f ./${SERVICE_NAME}.yaml
 
-k8s-shell-prod-istio:
+k8s-shell-locpick-istio:
 	kubectl exec -it $$(kubectl get pods -n default -o 'jsonpath={.items[?(@.metadata.labels.app=="locpick-dep-istio")].metadata.name}') -c locpick-prod -- /bin/bash -l -c "LOG_LEVEL=$(LOG_LEVEL) exec -l /bin/bash"

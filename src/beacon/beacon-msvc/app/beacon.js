@@ -37,7 +37,7 @@ const locpickProto = grpc.load(PROTO_PATH+"/locpick.proto").locpick
 const beaconProto = grpc.load(PROTO_PATH+"/beacon.proto").beacon
 
 gl.signal = {};
-gl.stage1BaseURL = `http://${common.HOST}:${common.STAGE1_PORT}`
+gl.stage1BaseURL = `http://${common.STAGE1_HOST}:${common.STAGE1_PORT}`
 gl.doWriteStage1 = false;
 // we're doing load balancing
 // so we don't want to wait for too long,
@@ -351,7 +351,9 @@ const getLoc = (zone, label) => new Promise((resolve, reject) => {
 		reject(error)
 	    } else {
 		log.debug(m("beacon.js: getLoc(): OK: gl.locpickGrpcTlsClient.info(): received response = " + JSON.stringify(response)))
-		resolve(response)
+		let loc = response
+		loc.locpickid = "tlsgrpc_locpickid"
+		resolve(loc)
 	    }
 	})
 	
@@ -365,6 +367,7 @@ const getLoc = (zone, label) => new Promise((resolve, reject) => {
 	    log.info(m("beacon.js: getLoc(): loc.loc[zone] = ", loc.loc["zone"]))
 	    if (loc.loc["zone"] === gl.zone) {
 		log.info(m("beacon.js: getLoc(): OK: locpick http loc"))
+		loc.loc.locpickid = "http_locpickid"
 		resolve(loc.loc)
 	    } else {
 		log.error(m("beacon.js: getLoc(): ERROR: locpick http loc"))

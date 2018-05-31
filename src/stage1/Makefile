@@ -193,7 +193,7 @@ k8s-shell-devshell-istio:
 
 
 ##
-## ISTIO STAGE1-PREM-1, PREM-2, CLOUD-1
+## ISTIO STAGE1-PREM-1
 ##
 k8s-build-stage1-istio-prem-1:
 	mkdir -p ./stage1-msvc/common/
@@ -210,14 +210,52 @@ k8s-create-stage1-istio-prem-1: APP=${SERVICE_NAME}
 k8s-create-stage1-istio-prem-1: REPLICAS=1
 k8s-create-stage1-istio-prem-1: LOG_LEVEL=debug
 k8s-create-stage1-istio-prem-1: CLUSTER=prem-1
-k8s-create-stage1-istio-prem-1: ZONE=nozone
+k8s-create-stage1-istio-prem-1: ZONE=zp
+k8s-create-stage1-istio-prem-1: VERSION=v1
 k8s-create-stage1-istio-prem-1: 
-	${ROOT_SRC_DIR}/tools/templ.js --templ=stage1-dep-istio.templ.yaml --data='{ "service-name" : "$(SERVICE_NAME)", "cluster" : "$(CLUSTER)", "zone" : "$(ZONE)", "replicas" : "$(REPLICAS)", "log-level" : "${LOG_LEVEL}", "app" : "${APP}", "cluster" : "${CLUSTER}",   "hostname" : "${HOSTNAME}"}' --file=${SERVICE_NAME}.yaml
-	kubectl create -f ./${SERVICE_NAME}.yaml
+	${ROOT_SRC_DIR}/tools/templ.js --templ=stage1-dep-istio.templ.yaml --data='{ "service-name" : "$(SERVICE_NAME)", "cluster" : "$(CLUSTER)", "zone" : "$(ZONE)", "replicas" : "$(REPLICAS)", "log-level" : "${LOG_LEVEL}", "app" : "${APP}", "cluster" : "${CLUSTER}", "version" : "${VERSION}" }' --file=${SERVICE_NAME}-${CLUSTER}-${ZONE}.yaml
+	kubectl create -f ./${SERVICE_NAME}-${CLUSTER}-${ZONE}.yaml
 
 k8s-delete-stage1-istio-prem-1: SERVICE_NAME=stage1-dep-istio
+k8s-delete-stage1-istio-prem-1: CLUSTER=prem-1
+k8s-delete-stage1-istio-prem-1: ZONE=zp
 k8s-delete-stage1-istio-prem-1:
-	kubectl delete -f ${SERVICE_NAME}.yaml
+	kubectl delete -f ./${SERVICE_NAME}-${CLUSTER}-${ZONE}.yaml
+
+
+
+##
+## ISTIO STAGE1-PREM-2
+##
+k8s-build-stage1-istio-prem-2:
+	mkdir -p ./stage1-msvc/common/
+	cp -rf ../common/* ./stage1-msvc/common/
+	mkdir -p ./stage1-msvc/protos/
+	cp -rf ../protos/* ./stage1-msvc/protos/
+	mkdir -p ./stage1-msvc/keys/
+	cp -rf ../keys/* ./stage1-msvc/keys/
+	$(MAKE) -C ./stage1-msvc k8s-build
+
+k8s-create-stage1-istio-prem-2: env
+k8s-create-stage1-istio-prem-2: SERVICE_NAME=stage1-dep-istio
+k8s-create-stage1-istio-prem-2: APP=${SERVICE_NAME}
+k8s-create-stage1-istio-prem-2: REPLICAS=1
+k8s-create-stage1-istio-prem-2: LOG_LEVEL=debug
+k8s-create-stage1-istio-prem-2: CLUSTER=prem-2
+k8s-create-stage1-istio-prem-2: ZONE=zp
+k8s-create-stage1-istio-prem-2: VERSION=v1
+k8s-create-stage1-istio-prem-2: 
+	${ROOT_SRC_DIR}/tools/templ.js --templ=stage1-dep-istio.templ.yaml --data='{ "service-name" : "$(SERVICE_NAME)", "cluster" : "$(CLUSTER)", "zone" : "$(ZONE)", "replicas" : "$(REPLICAS)", "log-level" : "${LOG_LEVEL}", "app" : "${APP}", "cluster" : "${CLUSTER}", "version" : "${VERSION}" }' --file=${SERVICE_NAME}-${CLUSTER}-${ZONE}.yaml
+#	kubectl create -f ./${SERVICE_NAME}-${CLUSTER}-${ZONE}.yaml
+	kubectl replace -f ./${SERVICE_NAME}-${CLUSTER}-${ZONE}.yaml
+
+k8s-delete-stage1-istio-prem-2: SERVICE_NAME=stage1-dep-istio
+k8s-delete-stage1-istio-prem-2: CLUSTER=prem-2
+k8s-delete-stage1-istio-prem-2: ZONE=zp
+k8s-delete-stage1-istio-prem-2:
+	kubectl delete -f ./${SERVICE_NAME}-${CLUSTER}-${ZONE}.yaml
+
+
 
 
 

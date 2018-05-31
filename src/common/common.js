@@ -10,6 +10,7 @@ const ELASTIC_PORT = 50003
 const POSTGRESQL_HOST = "postgresql-dep-svc.default.svc.cluster.local"
 const POSTGRESQL_PORT = 50005
 
+const STAGE1_HOST = "stage1-dep-istio.default.svc.cluster.local"
 const STAGE1_PORT = 50006
 const STAGE1_DEVSHELL_PORT = 55006
 
@@ -25,6 +26,7 @@ module.exports = {
     LOCPICK_DEVSHELL_PORT: LOCPICK_PORT,
     BEACON_PORT: BEACON_PORT,
     BEACON_DEVSHELL_PORT: BEACON_PORT,
+    STAGE1_HOST : STAGE1_HOST,
     STAGE1_PORT : STAGE1_PORT,
     STAGE1_DEVSHELL_PORT : STAGE1_DEVSHELL_PORT,
     LOCAL_SERVER_PORT : LOCAL_SERVER_PORT,

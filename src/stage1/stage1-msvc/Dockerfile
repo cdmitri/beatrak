@@ -16,7 +16,7 @@ ADD ./keys /root/beatrak/src/keys
 
 WORKDIR /root/beatrak/src/stage1/stage1-msvc/app
 
-COPY ./waitloop.sh ./start-dev.sh /
+COPY ./waitloop.sh ./start-dev.sh /start-prod.sh /
 RUN chmod a+x /waitloop.sh && chmod a+x /start-dev.sh
 
 # http
@@ -26,5 +26,6 @@ EXPOSE 8085
 # grpc tls
 EXPOSE 8090
 #CMD ["/waitloop.sh"]
+#CMD ["npm", "start"]
+CMD ["/start-prod.sh"]
 
-CMD ["npm", "start"]

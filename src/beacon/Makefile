@@ -228,7 +228,7 @@ k8s-shell-devshell-istio:
 	kubectl exec -it $$(kubectl get pods -n default -o 'jsonpath={.items[?(@.metadata.labels.app=="beacon-devshell-istio")].metadata.name}') -c ${SERVICE_NAME} -- /bin/bash -l -c "LOG_LEVEL=$(LOG_LEVEL) exec -l /bin/bash"
 
 ##
-## BEACON-PROD
+## ISTIO BEACON-ZA
 ##
 k8s-build-beacon-istio-za:
 	sudo mkdir -p ./beacon-msvc/common/
@@ -240,23 +240,24 @@ k8s-build-beacon-istio-za:
 	$(MAKE) -C ./beacon-msvc k8s-build
 
 k8s-create-beacon-istio-za: env
+k8s-create-beacon-istio-za: SERVICE_NAME=beacon-dep-istio
+k8s-create-beacon-istio-za: APP=${SERVICE_NAME}
 k8s-create-beacon-istio-za: REPLICAS=1
 k8s-create-beacon-istio-za: LOG_LEVEL=debug
-k8s-create-beacon-istio-za: SERVICE_NAME=beacon-istio-za-dep-istio
-k8s-create-beacon-istio-za: APP=${SERVICE_NAME}
+k8s-create-beacon-istio-za: CLUSTER=nocluster
 k8s-create-beacon-istio-za: ZONE=za
 k8s-create-beacon-istio-za: BEACON_SIG_NUMBER=-1
 k8s-create-beacon-istio-za: BEACON_SIG_PS=5
 k8s-create-beacon-istio-za:
-	${ROOT_SRC_DIR}/tools/templ.js --templ=beacon-dep-istio.templ.yaml --data='{"service-name" : "$(SERVICE_NAME)", "app" : "$(APP)", "replicas" : "$(REPLICAS)", "zone" : "$(ZONE)", "log-level" : "$(LOG_LEVEL)", "beacon-sig-number" : "$(BEACON_SIG_NUMBER)", "beacon-sig-ps": "$(BEACON_SIG_PS)" }' --file=${SERVICE_NAME}.yaml
-	kubectl create -f ./${SERVICE_NAME}.yaml
+	${ROOT_SRC_DIR}/tools/templ.js --templ=beacon-dep-istio.templ.yaml --data='{"service-name" : "$(SERVICE_NAME)", "app" : "$(APP)", "replicas" : "$(REPLICAS)", "zone" : "$(ZONE)", "log-level" : "$(LOG_LEVEL)", "beacon-sig-number" : "$(BEACON_SIG_NUMBER)", "beacon-sig-ps": "$(BEACON_SIG_PS)" }' --file=${SERVICE_NAME}-${CLUSTER}-${ZONE}.yaml
+	kubectl create -f ./${SERVICE_NAME}-${CLUSTER}-${ZONE}.yaml
 
-k8s-delete-beacon-istio-za: SERVICE_NAME=beacon-istio-za-dep-istio
+k8s-delete-beacon-istio-za: SERVICE_NAME=beacon-dep-istio
+k8s-delete-beacon-istio-za: CLUSTER=nocluster
+k8s-delete-beacon-istio-za: ZONE=za
 k8s-delete-beacon-istio-za:
-	kubectl delete -f ./${SERVICE_NAME}.yaml
+	kubectl delete -f ./${SERVICE_NAME}-${CLUSTER}-${ZONE}.yaml
 
-k8s-delete-prod-istio:
-	kubectl delete -f ./locpick-dep-istio.yaml
 
 
 

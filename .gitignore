@@ -25,3 +25,8 @@ stage1-dep-istio-prem-1.yaml
 stage1-dep-istio.yaml
 stage1-devshell-istio.yaml
 stage1-msvc/protos/
+beacon-dep-istio-nocluster-za.yaml
+stage1-dep-istio-prem-1-zp.yaml
+stage1-dep-istio-prem-2-zp.yaml
+stage1-dep-istio.templ.backaup.yaml
+stage1-msvc/protos
