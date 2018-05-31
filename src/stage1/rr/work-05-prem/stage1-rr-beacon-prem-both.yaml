@@ -1,0 +1,24 @@
+apiVersion: config.istio.io/v1alpha2
+kind: RouteRule
+metadata:
+  name: stage1-rr-beacon-to-prem-1-50-prem-2-50.yaml
+spec:
+  destination:
+    name: stage1-dep-istio
+  match:
+   source:
+     name: beacon-dep-istio
+  route:
+  - labels:
+      version: v1
+      cluster: prem-1
+      zone: zp
+    weight: 50
+  - labels:
+      version: v1
+      cluster: prem-2
+      zone: zp
+    weight: 50
+  - labels:
+      version: shutoff
+    weight: 0
