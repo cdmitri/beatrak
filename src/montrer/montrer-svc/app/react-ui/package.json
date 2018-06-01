@@ -9,11 +9,10 @@
     "react-scripts": "1.0.17"
   },
   "scripts": {
-      "start_older": "react-scripts start",
       "start": "PORT=50020 react-scripts start",
       "trace": "DEBUG=montrer,montrer_trace:* PORT=55020 react-scripts start",
-      "react-dev": "rm ~/app/react-ui/react-*.log; DEBUG=montrer:* PORT=55020 forever start --minUptime 1000 --spinSleepTime 1000 -l ~/app/react-ui/react-log.log -o ~/app/react-ui/react-out.log -e ~/app/react-ui/react-error.log ./node_modules/react-scripts/bin/react-scripts.js start",
-      "start_not_work": "rm ~/app/react-ui/react-*.log; PORT=50020 forever start --minUptime 1000 --spinSleepTime 1000 -l ~/app/react-ui/react-log.log -o ~/app/react-ui/react-out.log -e ~/app/react-ui/react-error.log ./node_modules/react-scripts/bin/react-scripts.js start",
+      "react-dev": "rm -f /root/beatrak/src/montrer/montrer-svc/app/react-ui/react-*.log; DEBUG=montrer:* PORT=55020 forever start --minUptime 1000 --spinSleepTime 1000 -l /root/beatrak/src/montrer/montrer-svc/app/react-ui/react-log.log -o /root/beatrak/src/montrer/montrer-svc/app/react-ui/react-out.log -e /root/beatrak/src/montrer/montrer-svc/app/react-ui/react-error.log ./node_modules/react-scripts/bin/react-scripts.js start",
+      "react-dev-stop": "forever stopall",
       "build": "react-scripts build",
       "test": "react-scripts test --env=jsdom",
       "eject": "react-scripts eject"

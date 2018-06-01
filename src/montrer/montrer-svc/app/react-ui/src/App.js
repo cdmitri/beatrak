@@ -45,7 +45,7 @@ class App extends React.Component {
     return (
       <div className="App">
         <header className="App-header">
-          <h1 className="App-title">Le grand spectacle pour montrer la fonctionnalité de l'envoyé proxy</h1>
+          <h1 className="App-title">DEVSHELL</h1>
         </header>
 	<div>
 	  <SignalTable signals={this.state.signals}/>
