@@ -179,7 +179,7 @@ k8s-create-locpick-istio:
 	${ROOT_SRC_DIR}/tools/templ.js --templ=locpick-dep-istio.templ.yaml --data='{ "service-name" : "${SERVICE_NAME}", "app" : "${APP}", "log-level" : "${LOG_LEVEL}", "replicas" : ${REPLICAS} }' --file=locpick-dep-istio.yaml
 	kubectl create -f ./${SERVICE_NAME}.yaml
 
-k8s-create-locpick-istio: SERVICE_NAME=locpick-dep-istio
+k8s-delete-locpick-istio: SERVICE_NAME=locpick-dep-istio
 k8s-delete-locpick-istio:
 	kubectl delete -f ./${SERVICE_NAME}.yaml
 
