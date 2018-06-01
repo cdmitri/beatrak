@@ -2,11 +2,18 @@ export SERVICE_NAME=montrer-envoy-dep-svc
 export APP=${SERVICE_NAME}
 
 env:
+ifndef HOSTNAME
+	$(eval export HOSTNAME=$(shell hostname))
+	@echo "HOSTNAME="${HOSTNAME}
+endif
+
 ifndef ROOT_SRC_DIR
-	$(eval ROOT_SRC_DIR=$(abspath ${PWD}/..))
+	$(eval ROOT_SRC_DIR=$(abspath ${PWD}/../..))
 	@echo "ROOT_SRC_DIR="${ROOT_SRC_DIR}
 endif
 	$(eval export NODE_PATH=/usr/lib/node_modules)
+	@echo "NODE_PATH="${NODE_PATH}
+
 ifndef TARGET
 TARGET = devshell
 endif

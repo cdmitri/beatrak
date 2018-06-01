@@ -38,6 +38,8 @@ spec:
     metadata:
       labels:
         app: {{ app }}
+      annotations:
+        sidecar.istio.io/inject: "false"
     spec:
       containers:
       - name: montrer-envoy
