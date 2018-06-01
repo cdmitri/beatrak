@@ -1,11 +1,18 @@
 import React from 'react';
 import GoogleMapReact from "google-map-react";
 
-const H_SIZE = 30;
-const W_SIZE = 60;
-const H_STICK = 40;
+//const H_SIZE = 30;
+//const W_SIZE = 60;
+//const H_STICK = 40;
+//const W_STICK = 3;
+//const R_CIRCLE = 8;
+
+const H_SIZE = 30*1;
+const W_SIZE = 60*3;
+const H_STICK = 40*2;
 const W_STICK = 3;
-const R_CIRCLE = 8;
+const R_CIRCLE = 8*2;
+
 
 
 const SignalMarkerStyle  = {
@@ -26,7 +33,7 @@ const SignalMarkerStyle  = {
 
 const SignalMarkerHoverStyle  = {
     ...SignalMarkerStyle,
-    border: "4px solid green",
+    border: "4px solid orange",
     opacity: 1,
     cursor: "pointer",
     zIndex: 1000
@@ -51,7 +58,6 @@ const SignalStickHoverStyle  = {
 };
 
 
-
 const SignalCircleStyle  = {
     position: "absolute",
     opacity: 0.9,
@@ -71,7 +77,7 @@ const SignalCircleHoverStyle  = {
     width: R_CIRCLE + 2,
     borderRadius: R_CIRCLE + 2,
     zIndex: 1000
-};
+}
 
 class SignalMarker extends React.Component {
     render = () => {

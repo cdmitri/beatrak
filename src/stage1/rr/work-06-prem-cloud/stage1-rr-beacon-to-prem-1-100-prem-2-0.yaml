@@ -7,7 +7,7 @@ spec:
     name: stage1-dep-istio
   match:
    source:
-     name: beacon-dep-istio
+     name: beacon-dep-istio-v1-florida
   route:
   - labels:
       version: v1

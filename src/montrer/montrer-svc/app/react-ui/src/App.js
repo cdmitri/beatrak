@@ -13,6 +13,8 @@ class App extends React.Component {
 	    timer: null,
 	    signals: [],
 	};
+
+	console.log("<App>: constructor(): this.state => ", this.state)
     }
 
     componentDidMount = () => {
@@ -48,7 +50,7 @@ class App extends React.Component {
           <h1 className="App-title">DEVSHELL</h1>
         </header>
 	<div>
-	  <SignalTable signals={this.state.signals}/>
+	  <SignalTable signals={this.state.signals} verbose="false"/>
 	  <div style={{margin: "auto", marginBottom: "50px", width: '1100px', height: '600px'}}>
           <SignalMap signals={this.state.signals}/>
 	  </div>

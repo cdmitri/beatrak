@@ -44,8 +44,10 @@ class SignalTable extends React.Component {
 //	var signals = this.state.signals;
 //	console.log("<SignalTable>: render(): start")
 //	console.log("<SignalTable>: render(): finish before return()")
-	return (
-	    <div>
+
+	if(this.props.verbose && this.props.verbose === "true") {
+		 return (
+ 	    <div>
 	      {/*	      <p>counter = {this.state.counter}</p> */}
 	      <table>
 		  <tbody>
@@ -78,8 +80,33 @@ class SignalTable extends React.Component {
 	          )}
 	       </tbody></table>
 	    </div>
-	);
-	
+	)} else {
+
+		 return (
+ 	    <div>
+	      {/*	      <p>counter = {this.state.counter}</p> */}
+	      <table>
+		  <tbody>
+	            <tr>
+      		     <th>beacon</th>
+		     <th>service</th>
+		     <th>traffic %</th>
+    		     <th>last</th>
+		  </tr>
+		    {signals.map(signal =>
+			       <tr key={signal.beacon_id + ":" + signal.stage1_id}>
+				     {/* <td key={signal.beacon_id + signal.stage_id}>lala</td> */}
+					 <td>{signal.loc.name}</td>
+					 <td>{signal.stage1_cluster}</td>
+				         <td>{signal.sp}</td>
+				         <td>{moment(signal.last_ts).format("YYYY-MM-DD HH:mm:ss")}</td>
+			       </tr>
+	          )}
+	       </tbody></table>
+	    </div>
+	)
+
+	}
     }
 
 } // SignalTable
