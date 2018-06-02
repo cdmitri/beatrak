@@ -1,8 +1,10 @@
 //-*- mode: rjsx;-*-, eval: (auto-fill-mode 1); -*-
-import React from 'react';
-import './App.css';
-import SignalTable from "./SignalTable.jsx";
-import SignalMap from "./SignalMap.jsx";
+import React from "react";
+import "./App.css" 
+import SignalTable from "./SignalTable.jsx"
+import SignalMap from "./SignalMap.jsx"
+import {withRouter} from "react-router-dom"
+//import queryString from "query-string"
 
 class App extends React.Component {
 
@@ -14,11 +16,24 @@ class App extends React.Component {
 	    signals: [],
 	};
 
+
+//        let search = queryString.parse(this.props.location.search)
+//	console.log("<ActivateAccount>: getSearch(): search => ", search)
+
+	
+	console.log("<App>: constructor(): this.props => ", this.props)
+
+	
+	// read the ?verbose flag from the URL
 	this.state.verbose = true
+	
 	console.log("<App>: constructor(): this.state => ", this.state)
     }
 
     componentDidMount = () => {
+
+	console.log("<App>: componentDidMount(): this.props => ", this.props)
+	
 	this.tick(); // to the first tick right away
 
 	var timer = setInterval(this.tick, 1000)
@@ -61,4 +76,5 @@ class App extends React.Component {
   }
 }
 
+withRouter(App)
 export default App;

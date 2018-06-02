@@ -30,3 +30,4 @@ stage1-dep-istio-prem-1-zp.yaml
 stage1-dep-istio-prem-2-zp.yaml
 stage1-dep-istio.templ.backaup.yaml
 stage1-msvc/protos
+grafana.db
