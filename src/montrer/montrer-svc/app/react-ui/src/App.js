@@ -14,6 +14,7 @@ class App extends React.Component {
 	    signals: [],
 	};
 
+	this.state.verbose = true
 	console.log("<App>: constructor(): this.state => ", this.state)
     }
 

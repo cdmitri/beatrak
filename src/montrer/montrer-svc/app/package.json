@@ -3,9 +3,9 @@
     "version": "0.0.0",
     "private": true,
     "scripts": {
-	"express-dev": "rm -f /root/beatrak/src/montrer/montrer-svc/app/express-*.log; DEBUG=montrer:* PORT=50010 forever start -l /root/beatrak/src/montrer/montrer-svc/app/express-log.log -o /root/beatrak/src/montrer/montrer-svc/app/express-out.log -e /root/beatrak/src/montrer/montrer-svc/app/express-error.log -c '/usr/bin/nodemon --exitcrash' montrer-server.js",
+	"express-dev": "rm -f /root/beatrak/logs/express-*.log; DEBUG=montrer:* PORT=50010 forever start -l /root/beatrak/logs/express-log.log -o /root/beatrak/logs/express-out.log -e /root/beatrak/logs/express-error.log -c '/usr/bin/nodemon --exitcrash' montrer-server.js",
 	"express-dev-stop": "forever stopall",
-	"start": "rm -f /root/app/express-*.log; PORT=50010 forever start -l /root/app/express-log.log -o /root/app/express-out.log -e /root/express-error.log montrer-server.js"
+	"start": "rm -f /root/beatrak/logs/express-*.log; PORT=50010 forever start -l /root/beatrak/logs/express-log.log -o /root/beatrak/logs/express-out.log -e /root/beatrak/logs/express-error.log montrer-server.js"
     },
     "dependencies": {
 	"body-parser": "~1.18.2",
