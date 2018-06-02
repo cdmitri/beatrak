@@ -45,7 +45,7 @@ class SignalTable extends React.Component {
 //	console.log("<SignalTable>: render(): start")
 //	console.log("<SignalTable>: render(): finish before return()")
 
-	if(this.props.verbose && this.props.verbose === "true") {
+	if(this.props.verbose && this.props.verbose === true) {
 		 return (
  	    <div>
 	      {/*	      <p>counter = {this.state.counter}</p> */}

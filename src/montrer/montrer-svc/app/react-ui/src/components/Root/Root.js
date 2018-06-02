@@ -7,19 +7,16 @@ import {
     Switch,
 } from 'react-router-dom';
 
-//import App from './App';
-//import Home from './Home';
-//import About from './About';
-//import Page from './Page';
-
 import Prep from "../Prep/Prep.js"
+import App from "../App/App.js"
 
 const Root = (props) => {
     console.log("<Root>: props = ", props)
     return (
 	  <BrowserRouter>
-	  <Switch>
-          <Route path="*" component={Prep} />
+	    <Switch>
+              <Route exact path="/" component={App} />
+              <Route path="*" component={Prep} />
             </Switch>
           </BrowserRouter>
   )

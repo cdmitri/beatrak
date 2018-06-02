@@ -1,10 +1,12 @@
 //-*- mode: rjsx;-*-, eval: (auto-fill-mode 1); -*-
 import React from "react";
 import "./App.css" 
-import SignalTable from "./SignalTable.jsx"
-import SignalMap from "./SignalMap.jsx"
 import {withRouter} from "react-router-dom"
-//import queryString from "query-string"
+import queryString from "query-string"
+import SignalTable from  "../SignalTable/SignalTable.jsx"
+import SignalMap from  "../SignalMap/SignalMap.jsx"
+import ClusterTable from  "../ClusterTable/ClusterTable.jsx"
+
 
 class App extends React.Component {
 
@@ -14,24 +16,23 @@ class App extends React.Component {
 	    counter: 0,
 	    timer: null,
 	    signals: [],
+	    verbose: false,
 	};
 
+        let search = queryString.parse(this.props.location.search)
+	console.log("<App>: search => ", search)
 
-//        let search = queryString.parse(this.props.location.search)
-//	console.log("<ActivateAccount>: getSearch(): search => ", search)
-
-	
-	console.log("<App>: constructor(): this.props => ", this.props)
-
-	
-	// read the ?verbose flag from the URL
-	this.state.verbose = true
-	
-	console.log("<App>: constructor(): this.state => ", this.state)
+	if(typeof search.verbose !== "undefined" && search.verbose === "true") {
+	    console.log("<App>: do verbose")
+	    this.state.verbose = true
+	} else {
+	    console.log("<App>: do normal")
+	    this.state.verbose = false
+	}
     }
 
-    componentDidMount = () => {
 
+    componentDidMount = () => {
 	console.log("<App>: componentDidMount(): this.props => ", this.props)
 	
 	this.tick(); // to the first tick right away
@@ -43,38 +44,38 @@ class App extends React.Component {
     componentWillUnmount = () => {
 	this.clearInterval(this.state.timer)
     }
-    
 
     tick = () => {
 	fetch("/api/v1/signals")
-	.then(res => {
-	    // console.log("<App>: tick(): res => ", res)
-	    return res.json()
-	})
-	.then(signals => {
-	    // console.log("<App>: tick(): signals => ", signals)
-
-	    this.setState({ signals });
-	    //console.log("<App>: tick(): state => ", this.state)
-	});
+	    .then(res => {
+		return res.json()
+	    })
+	    .then(signals => {
+		this.setState({ signals });
+	    });
     }
-
-  render = () => {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <h1 className="App-title">DEVSHELL</h1>
-        </header>
-	<div>
-	  <SignalTable signals={this.state.signals} verbose="false"/>
-	  <div style={{margin: "auto", marginBottom: "50px", width: '1100px', height: '600px'}}>
-          <SignalMap signals={this.state.signals}/>
-	  </div>
-        </div>
-      </div>
-    );
-  }
+    
+    render = () => {
+	return (
+		<div className="App">
+		  <header className="App-header">
+		    <h1 className="App-title">DEVSHELL</h1>
+		  </header>
+		  <div>
+		    <SignalTable signals={this.state.signals} verbose={this.state.verbose}/>
+		    <ClusterTable signals={this.state.signals} verbose={this.state.verbose}/>
+	              <div style={{margin: "auto", marginBottom: "50px", width: '1100px', height: '600px'}}>
+		        <SignalMap signals={this.state.signals}/>
+		      </div>
+		  </div>
+		</div>
+	)
+    }
 }
 
 withRouter(App)
 export default App;
+
+
+
+
