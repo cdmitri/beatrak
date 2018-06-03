@@ -47,7 +47,6 @@ beacon-shell-devshell:
 beacon-delete-devshell:
 	$(MAKE) -C ${ROOT_SRC_DIR}/src/beacon k8s-delete-devshell-istio
 
-
 #
 # STAGE1
 #
