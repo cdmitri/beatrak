@@ -1,0 +1,29 @@
+apiVersion: config.istio.io/v1alpha2
+kind: RouteRule
+metadata:
+  name: stage1-rr-beacon
+spec:
+  destination:
+    name: stage1-dep-istio
+  match:
+   source:
+     name: beacon-dep-istio-v1-florida
+  route:
+  - labels:
+      version: v1
+      cluster: prem-1
+      zone: zp
+    weight: 100
+  - labels:
+      version: v1
+      cluster: prem-2
+      zone: zp
+    weight: 0
+  - labels:
+      version: v1
+      cluster: cloud-1
+      zone: zc
+    weight: 0
+  - labels:
+      version: shutoff
+    weight: 0

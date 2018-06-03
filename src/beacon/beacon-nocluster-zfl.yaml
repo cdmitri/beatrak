@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-    name: "{{ service-name }}"
+    name: "beacon"
     labels:
-      app: "{{ app }}"
+      app: "beacon"
       version: clus-istio
 spec:
   ports:
@@ -21,20 +21,20 @@ spec:
     targetPort: 52002
   clusterIP:  None
   selector:
-    app: "{{ app }}"
+    app: "beacon"
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: "{{ service-name }}"
+  name: "beacon"
 spec:
-  replicas: {{ replicas }}
+  replicas: 3
   template:
     metadata:
       labels:
-        app: "{{ app }}"
-        cluster: "{{ cluster }}"
-        zone: "{{ zone }}"
+        app: "beacon"
+        cluster: ""
+        zone: "zfl"
         version: clus-istio
     spec:
       containers:
@@ -43,20 +43,20 @@ spec:
         imagePullPolicy: IfNotPresent
         env:
         - name: "LOG_LEVEL"
-          value: "{{ log-level }}"
+          value: "debug"
         - name: "SERVICE_NAME"
-          value: "{{ service-name }}"
+          value: "beacon"
         - name: "ZONE"
-          value: "{{ zone }}"
+          value: "zfl"
         - name: "BEACON_SIG_NUMBER"
-          value: "{{ beacon-sig-number }}"
+          value: "-1"
         - name: "BEACON_SIG_PS"
-          value: "{{ beacon-sig-ps }}"
+          value: "10"
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: "{{ service-name }}"
+  name: "beacon"
   annotations:
     kubernetes.io/ingress.class: "istio"
 spec:
@@ -65,6 +65,6 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: "{{ service-name }}"
+          serviceName: "beacon"
           servicePort: 51234
 ---

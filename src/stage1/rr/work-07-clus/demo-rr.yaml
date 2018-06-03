@@ -1,0 +1,20 @@
+apiVersion: config.istio.io/v1alpha2
+kind: RouteRule
+metadata:
+  name: service
+spec:
+  destination:
+    name: service
+  match:
+   source:
+     name: beacon
+  route:
+  - labels:
+      server: on-prem-service-1
+    weight: 90
+  - labels:
+      server: on-prem-service-2
+    weight: 0
+  - labels:
+      server: cloud-service-1
+    weight: 10

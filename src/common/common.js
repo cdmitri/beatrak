@@ -10,7 +10,8 @@ const ELASTIC_PORT = 50003
 const POSTGRESQL_HOST = "postgresql-dep-svc.default.svc.cluster.local"
 const POSTGRESQL_PORT = 50005
 
-const STAGE1_HOST = "stage1-dep-istio.default.svc.cluster.local"
+//const STAGE1_HOST = "stage1-dep-istio.default.svc.cluster.local"
+const STAGE1_HOST = "service.default.svc.cluster.local"
 const STAGE1_PORT = 50006
 const STAGE1_DEVSHELL_PORT = 55006
 

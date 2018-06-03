@@ -56,8 +56,16 @@ stage1-build:
 	$(MAKE) -C ${ROOT_SRC_DIR}/src/stage1 build
 
 stage1-create:
-	kubectl create -f src/stage1/rr/work-06-prem-cloud/stage1-dep-istio-prem-cloud.yaml
+	kubectl create -f src/stage1/rr/work-07-clus/stage1-service.yaml
 
 stage1-delete:
-	kubectl delete -f src/stage1/rr/work-06-prem-cloud/stage1-dep-istio-prem-cloud.yaml
+	kubectl delete -f src/stage1/rr/work-07-clus/stage1-service.yaml
 
+show:
+	kubectl get pods -Lapp,version,cluster,zone  --watch | grep clus-istio
+
+rr-show:
+	kubectl get routerules
+
+rr-delete:
+	kubectl delete routerules stage1-rr-beacon

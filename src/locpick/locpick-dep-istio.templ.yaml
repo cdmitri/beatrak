@@ -4,6 +4,7 @@ metadata:
     name: "{{ service-name }}"
     labels:
       app: "{{ app }}"
+      version: clus-istio
 spec:
   ports:
   - name: http
@@ -32,6 +33,7 @@ spec:
     metadata:
       labels:
         app: "{{ app }}"
+        version: clus-istio
     spec:
       containers:
       - name: locpick-prod

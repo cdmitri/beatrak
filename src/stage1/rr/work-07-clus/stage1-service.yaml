@@ -1,0 +1,129 @@
+apiVersion: v1
+kind: Service
+metadata:
+    name: service
+    labels:
+      app: service
+spec:
+  type: NodePort
+  ports:
+  - port: 50006
+    name: http
+  selector:
+    app: service
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: on-prem-service-1
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: service
+        version: clus-istio
+        cluster: on-prem-service-1
+        zone: zonprem
+    spec:
+      containers:
+      - name: stage1
+        image: beatrak/stage1
+        resources:
+          requests:
+            cpu: "100m"
+        imagePullPolicy: IfNotPresent #Always
+        ports:
+        - containerPort: 50006
+        env:
+          - name: "LOG_LEVEL"
+            value: "debug"
+          - name: "SERVICE_NAME"
+            value: "service"
+          - name: "CLUSTER"
+            value: "on-prem-service-1"
+          - name: "ZONE"
+            value: "zonprem"
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: on-prem-service-2
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: service
+        version: clus-istio
+        cluster: on-prem-service-2
+        zone: zonprem
+    spec:
+      containers:
+      - name: stage1
+        image: beatrak/stage1
+        resources:
+          requests:
+            cpu: "100m"
+        imagePullPolicy: IfNotPresent #Always
+        ports:
+        - containerPort: 50006
+        env:
+          - name: "LOG_LEVEL"
+            value: "debug"
+          - name: "SERVICE_NAME"
+            value: "service"
+          - name: "CLUSTER"
+            value: "on-prem-service-2"
+          - name: "ZONE"
+            value: "zonprem"
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: cloud-service-1
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: service
+        version: clus-istio
+        cluster: cloud-service-1
+        zone: zcloud
+    spec:
+      containers:
+      - name: stage1
+        image: beatrak/stage1
+        resources:
+          requests:
+            cpu: "100m"
+        imagePullPolicy: IfNotPresent #Always
+        ports:
+        - containerPort: 50006
+        env:
+          - name: "LOG_LEVEL"
+            value: "debug"
+          - name: "SERVICE_NAME"
+            value: "service"
+          - name: "CLUSTER"
+            value: "cloud-service-1"
+          - name: "ZONE"
+            value: "zcloud"
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: service
+  annotations:
+    kubernetes.io/ingress.class: "istio"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /
+        backend:
+          serviceName: service
+          servicePort: 50006
+---
