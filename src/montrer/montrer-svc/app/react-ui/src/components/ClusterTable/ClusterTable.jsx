@@ -35,7 +35,6 @@ class ClusterTable extends React.Component {
 	//console.log("<ClusterTable>: tick(): finish")
     }
     
-    
     render() {
 	const {
 	    signals
@@ -44,21 +43,10 @@ class ClusterTable extends React.Component {
 	console.log("<ClusterTable>: render(): start")
 	console.log("<ClusterTable>: render(): signals", signals)
 
-//	var clusters = new Map();
-//	clusters.set("on-prem-service-1", {name: "on-prem-service-1", tp:10})
-//	clusters.set("on-prem-service-2", {name: "on-prem-service-2", tp:90})
-
-	var clusters = [{stage1_cluster: "prem-1", sp:100}, {stage1_cluster: "prem-2", sp:200}] 
+	//	var clusters = [{stage1_cluster: "prem-1", sp:100}, {stage1_cluster: "prem-2", sp:200}]
+	var clusters = []
 
 	console.log("<ClusterTable>: clusters = ", clusters)
-
-//	var cl = signals.map((signal) => {
-//	    return (
-//		console.log("signal =>", signal),
-//		clusters.push({stage1_cluster: "on-prem-service-1"})
-//	    )
-//	})
-	
 
 	for (var si in signals) {
 	    let signal = signals[si]
@@ -72,14 +60,15 @@ class ClusterTable extends React.Component {
 		if(signal.stage1_cluster === clusters[ci].stage1_cluster) {
 		    console.log("found")
 		    cluster = clusters[ci]
-		    clusters[ci].sp = parseInt(clusters[ci].sp) + parseInt(signal.sp)
+		    clusters[ci].sp = parseInt(clusters[ci].sp,10) + parseInt(signal.sp,10)
+		    clusters[ci].last_ts = signal.last_ts
 		    break
 		} else {
-		    console.log("not found")
+		    // console.log("not found")
 		}
 	    }
 	    if(cluster == null) {
-		clusters.push({stage1_cluster: signal.stage1_cluster, sp: signal.sp})
+		clusters.push({stage1_cluster: signal.stage1_cluster, sp: signal.sp, last_ts: signal.last_ts})
 	    }
 	}
 
@@ -93,15 +82,13 @@ class ClusterTable extends React.Component {
 		     <th>traffic %</th>
     		     <th>last cluster</th>
 		    </tr>
-
 		    {clusters.map(cluster =>
 			       <tr key={cluster.stage1_cluster + ":" + 10}>
 				     <td>{cluster.stage1_cluster}</td>
 				     <td>{cluster.sp}</td>
-			             <td>time</td>
+			             <td>{moment(cluster.last_ts).format("YYYY-MM-DD HH:mm:ss")}</td>
 			       </tr>
 	          )}
-		    
 	       </tbody></table>
 	    </div>
 	)
