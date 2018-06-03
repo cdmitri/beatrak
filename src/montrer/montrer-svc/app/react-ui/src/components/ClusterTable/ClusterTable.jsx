@@ -5,7 +5,7 @@ class ClusterTable extends React.Component {
     constructor(props) {
 	super(props)
 
-	console.log("<ClusterTable>: constructor(): props = ", props)
+//	console.log("<ClusterTable>: constructor(): props = ", props)
 	
 	this.state = {
 	    signals: null
@@ -13,17 +13,17 @@ class ClusterTable extends React.Component {
     } // constructor
 
     componentDidMount = () => {
-	console.log("<ClusterTable>: componentDidMount(): start")
-	console.log("<ClusterTable>: componentDidMount(): this.props = ", this.props)
+//	console.log("<ClusterTable>: componentDidMount(): start")
+//	console.log("<ClusterTable>: componentDidMount(): this.props = ", this.props)
 //	this.setState({signals: this.props.signals})
 //	this.tick() // to 1 tick right away
 //	var timer = setInterval(this.tick, 1000)
 //	this.setState({timer: timer})
-	console.log("<ClusterTable>: componentDidMount(): finish")
+//	console.log("<ClusterTable>: componentDidMount(): finish")
     }
 
     componentWillUnmount = () => {
-	console.log("<ClusterTable>: unount(): start")
+//	console.log("<ClusterTable>: unount(): start")
 	this.clearInterval(this.state.timer)
     }
 
@@ -40,25 +40,25 @@ class ClusterTable extends React.Component {
 	    signals
 	} = this.props;
 
-	console.log("<ClusterTable>: render(): start")
-	console.log("<ClusterTable>: render(): signals", signals)
+//	console.log("<ClusterTable>: render(): start")
+//	console.log("<ClusterTable>: render(): signals", signals)
 
 	//	var clusters = [{stage1_cluster: "prem-1", sp:100}, {stage1_cluster: "prem-2", sp:200}]
 	var clusters = []
 
-	console.log("<ClusterTable>: clusters = ", clusters)
+//	console.log("<ClusterTable>: clusters = ", clusters)
 
 	for (var si in signals) {
 	    let signal = signals[si]
-	    console.log("signal =>", signal)
+//	    console.log("signal =>", signal)
 
-	    console.log("signal.stage1_cluster =>", signal.stage1_cluster)
+//	    console.log("signal.stage1_cluster =>", signal.stage1_cluster)
 
 	    let cluster = null
 	    for (var ci in clusters) {
-		console.log("cluster = ", clusters[ci])
+//		console.log("cluster = ", clusters[ci])
 		if(signal.stage1_cluster === clusters[ci].stage1_cluster) {
-		    console.log("found")
+//		    console.log("found")
 		    cluster = clusters[ci]
 		    clusters[ci].sp = parseInt(clusters[ci].sp,10) + parseInt(signal.sp,10)
 		    clusters[ci].last_ts = signal.last_ts
@@ -72,7 +72,7 @@ class ClusterTable extends React.Component {
 	    }
 	}
 
-	console.log("final clusters = ", clusters)
+//	console.log("final clusters = ", clusters)
 	
 	return (
 	    <div>

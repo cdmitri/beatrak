@@ -7,21 +7,16 @@ import GoogleMapReact from "google-map-react";
 //const W_STICK = 3;
 //const R_CIRCLE = 8;
 
-const H_SIZE = 30*2;
+const H_SIZE = 30*3;
 const W_SIZE = 60*3;
 const H_STICK = 40*2;
 const W_STICK = 3;
 const R_CIRCLE = 8*2;
 
-
-
-const SignalMarkerStyle  = {
-    //    position: 'relative',
+const TrafficMarkerStyle  = {
     position: "absolute",
     color: "black",
-    //    background: 'lightgray',
     background: "white",
-    //    border: "2px solid #f44336",
     opacity: 0.9,
     border: "2px solid green",
     textAlign: "center",
@@ -31,8 +26,8 @@ const SignalMarkerStyle  = {
     left: -W_SIZE / 2
 };
 
-const SignalMarkerHoverStyle  = {
-    ...SignalMarkerStyle,
+const TrafficMarkerHoverStyle  = {
+    ...TrafficMarkerStyle,
     border: "4px solid orange",
     opacity: 1,
     cursor: "pointer",
@@ -40,7 +35,7 @@ const SignalMarkerHoverStyle  = {
 };
 
 
-const SignalStickStyle  = {
+const TrafficStickStyle  = {
     position: "absolute",
     opacity: 0.9,
     top: -H_STICK,
@@ -49,8 +44,8 @@ const SignalStickStyle  = {
     backgroundColor: 'green'
 };
 
-const SignalStickHoverStyle  = {
-    ...SignalStickStyle,
+const TrafficStickHoverStyle  = {
+    ...TrafficStickStyle,
     width: W_STICK + 1,
     opacity: 1,
     cursor: "pointer",
@@ -58,7 +53,7 @@ const SignalStickHoverStyle  = {
 };
 
 
-const SignalCircleStyle  = {
+const TrafficCircleStyle  = {
     position: "absolute",
     opacity: 0.9,
     height: R_CIRCLE,
@@ -69,8 +64,8 @@ const SignalCircleStyle  = {
     backgroundColor: "green"
 };
 
-const SignalCircleHoverStyle  = {
-    ...SignalCircleStyle,
+const TrafficCircleHoverStyle  = {
+    ...TrafficCircleStyle,
     opacity: 1,
     cursor: "pointer",
     height: R_CIRCLE + 2,
@@ -79,45 +74,55 @@ const SignalCircleHoverStyle  = {
     zIndex: 1000
 }
 
-class SignalMarker extends React.Component {
+class TrafficMarker extends React.Component {
     render = () => {
-	const circleStyle = this.props.$hover ? SignalCircleHoverStyle : SignalCircleStyle;
-	const stickStyle = this.props.$hover ? SignalStickHoverStyle : SignalStickStyle;
-	const markerStyle = this.props.$hover ? SignalMarkerHoverStyle : SignalMarkerStyle;
+//	const circleStyle = this.props.$hover ? TrafficCircleHoverStyle : TrafficCircleStyle;
+//	const stickStyle = this.props.$hover ? TrafficStickHoverStyle : TrafficStickStyle;
+//	const markerStyle = this.props.$hover ? TrafficMarkerHoverStyle : TrafficMarkerStyle;
 
+
+	const circleStyle = TrafficCircleStyle
+	const stickStyle = TrafficStickStyle
+	const markerStyle = TrafficMarkerStyle
+
+	
 	// just because I can ;))
 	let clustersString = (() => {
 	    let s = "{";
-	    for(let cluster in  this.props.clusters) {
-		// console.log("SignalMarker: cluster = " + cluster);
+	    for(let cluster in this.props.clusters) {
+		// console.log("TrafficMarker: cluster = " + cluster);
 		s += (cluster === "0" ? "" : ",") +  this.props.clusters[cluster];
 	    }
 	    return s + "}";
 	})();
 
+	let clusterTable =
+	    <table><tbody>
+	    <tr><td>first sdf</td></tr>
+	    <tr><td>second line</td></tr>
+	    </tbody></table>
 
 	return (
 	    <div>
-	      <div style={circleStyle}/>
-	      <div style={stickStyle}/>
 	      <div style={markerStyle}>
 		<div>
-		  <b>{this.props.text}</b>
+		  <b>some text</b><br/>
+		  <b>more text</b>
+		  <table><tbody><tr><td>first line</td></tr></tbody></table>
 		</div>
-		<i>{clustersString}</i>
 	      </div>
 	    </div>
-	);
+	)
     }
 }
 
 
 
-class SignalMap extends React.Component {
+class TrafficMap extends React.Component {
     constructor(props) {
 	super(props)
 
-	console.log("<SignalMap>: constructor(): props = ", props)
+	console.log("<TrafficMap>: constructor(): props = ", props)
 	
 	this.state = {
 	    //	    center: {lat: 50.8386789, lng: 4.32},
@@ -152,7 +157,7 @@ class SignalMap extends React.Component {
               defaultZoom={this.state.zoom}
 	      >
 			   {signals.map(signal =>
- 					<SignalMarker key={signal.beacon_id + ":" + signal.stage1_id}
+ 					<TrafficMarker key={signal.beacon_id + ":" + signal.stage1_id}
 			                lat={signal.loc.lonlat.split(',')[0]} 
 			                lng={signal.loc.lonlat.split(',')[1]} 
 				        text={signal.loc.name}
@@ -165,7 +170,7 @@ class SignalMap extends React.Component {
     }
 }
 
-export default SignalMap
+export default TrafficMap
 
 
 

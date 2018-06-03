@@ -7,7 +7,6 @@ import SignalTable from  "../SignalTable/SignalTable.jsx"
 import TrafficMap from  "../TrafficMap/TrafficMap.jsx" 
 import ClusterTable from  "../ClusterTable/ClusterTable.jsx"
 
-
 class App extends React.Component {
 
     constructor(props) {

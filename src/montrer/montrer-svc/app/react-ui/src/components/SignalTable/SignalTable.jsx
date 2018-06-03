@@ -5,7 +5,7 @@ class SignalTable extends React.Component {
     constructor(props) {
 	super(props)
 
-	console.log("<SignalTable>: constructor(): props = ", props)
+//	console.log("<SignalTable>: constructor(): props = ", props)
 	
 	this.state = {
 	    signals: null
@@ -13,17 +13,17 @@ class SignalTable extends React.Component {
     } // constructor
 
     componentDidMount = () => {
-	console.log("<SignalTable>: componentDidMount(): start")
-	console.log("<SignalTable>: componentDidMount(): this.props = ", this.props)
+//	console.log("<SignalTable>: componentDidMount(): start")
+//	console.log("<SignalTable>: componentDidMount(): this.props = ", this.props)
 //	this.setState({signals: this.props.signals})
 //	this.tick() // to 1 tick right away
 //	var timer = setInterval(this.tick, 1000)
 //	this.setState({timer: timer})
-	console.log("<SignalTable>: componentDidMount(): finish")
+//	console.log("<SignalTable>: componentDidMount(): finish")
     }
 
     componentWillUnmount = () => {
-	console.log("<SignalTable>: unount(): start")
+//	console.log("<SignalTable>: unount(): start")
 	this.clearInterval(this.state.timer)
     }
 

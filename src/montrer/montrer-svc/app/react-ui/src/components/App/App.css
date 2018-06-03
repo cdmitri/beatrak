@@ -22,6 +22,30 @@
   font-size: large;
 }
 
+.App-table {
+    border-collapse: collapse;
+    margin-left: auto; 
+    margin-right: auto;
+    borderspacing: 5px; /* cellspacing */
+    margin-top: 50px;
+    margin-bottom: 50px;
+    border: 1px solid black;
+    padding: 5px; /* cellpadding */
+}
+
+.App-table td th {
+    border: 1px solid black;
+    padding: 5px; /* cellpadding */
+}
+
+.table-params {
+    border-collapse: collapse;
+    margin-left: auto; 
+    margin-right: auto;
+    borderspacing: 5px; /* cellspacing */
+}
+
+
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
@@ -47,27 +71,4 @@
     border-collapse: collapse;
 }
 
-
-table {
-    border-collapse: collapse;
-    margin-left: auto; 
-    margin-right: auto;
-    borderspacing: 5px; /* cellspacing */
-    margin-top: 50px;
-    margin-bottom: 50px;
-}
-
-.table-params {
-    border-collapse: collapse;
-    margin-left: auto; 
-    margin-right: auto;
-    borderspacing: 5px; /* cellspacing */
-}
-
-
-table, td, th {
-    border: 1px solid black;
-    padding: 5px; /* cellpadding */
-}
-    
 
