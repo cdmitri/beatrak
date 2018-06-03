@@ -26,13 +26,13 @@ locpick-delete:
 #
 
 beacon-build:
-	$(MAKE) -C ${ROOT_SRC_DIR}/src/beacon k8s-build-beacon-istio-za
+	$(MAKE) -C ${ROOT_SRC_DIR}/src/beacon k8s-build-beacon-istio-zfl
 
 beacon-create:
-	$(MAKE) -C ${ROOT_SRC_DIR}/src/beacon k8s-create-beacon-istio-za
+	$(MAKE) -C ${ROOT_SRC_DIR}/src/beacon k8s-create-beacon-istio-zfl
 
 beacon-delete:
-	$(MAKE) -C ${ROOT_SRC_DIR}/src/beacon k8s-delete-beacon-istio-za
+	$(MAKE) -C ${ROOT_SRC_DIR}/src/beacon k8s-delete-beacon-istio-zfl
 
 # devshell
 beacon-build-devshell:
