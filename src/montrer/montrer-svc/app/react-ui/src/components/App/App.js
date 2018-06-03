@@ -4,7 +4,7 @@ import "./App.css"
 import {withRouter} from "react-router-dom"
 import queryString from "query-string"
 import SignalTable from  "../SignalTable/SignalTable.jsx"
-import SignalMap from  "../SignalMap/SignalMap.jsx"
+import TrafficMap from  "../TrafficMap/TrafficMap.jsx" 
 import ClusterTable from  "../ClusterTable/ClusterTable.jsx"
 
 
@@ -65,7 +65,7 @@ class App extends React.Component {
 		    <SignalTable signals={this.state.signals} verbose={this.state.verbose}/>
 		    <ClusterTable signals={this.state.signals} verbose={this.state.verbose}/>
 	              <div style={{margin: "auto", marginBottom: "50px", width: '1100px', height: '600px'}}>
-		        <SignalMap signals={this.state.signals}/>
+		        <TrafficMap signals={this.state.signals}/>
 		      </div>
 		  </div>
 		</div>

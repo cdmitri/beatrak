@@ -28,7 +28,7 @@ kind: Deployment
 metadata:
   name: "beacon"
 spec:
-  replicas: 3
+  replicas: 1
   template:
     metadata:
       labels:

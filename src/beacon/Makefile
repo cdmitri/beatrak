@@ -273,7 +273,7 @@ k8s-build-beacon-istio-zfl:
 k8s-create-beacon-istio-zfl: env
 k8s-create-beacon-istio-zfl: SERVICE_NAME=beacon
 k8s-create-beacon-istio-zfl: APP=${SERVICE_NAME}
-k8s-create-beacon-istio-zfl: REPLICAS=3
+k8s-create-beacon-istio-zfl: REPLICAS=1
 k8s-create-beacon-istio-zfl: LOG_LEVEL=debug
 k8s-create-beacon-istio-zfl: CLUSTER=nocluster
 k8s-create-beacon-istio-zfl: ZONE=zfl
