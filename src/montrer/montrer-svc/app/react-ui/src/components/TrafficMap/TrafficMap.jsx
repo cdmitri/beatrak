@@ -1,5 +1,6 @@
 import React from 'react';
 import GoogleMapReact from "google-map-react";
+import "./TrafficMap.css"
 
 //const H_SIZE = 30;
 //const W_SIZE = 60;
@@ -24,7 +25,7 @@ const TrafficMarkerStyle  = {
     width: W_SIZE,
     top: -(H_SIZE / 2 + H_STICK),
     left: -W_SIZE / 2
-};
+}
 
 const TrafficMarkerHoverStyle  = {
     ...TrafficMarkerStyle,
@@ -38,8 +39,8 @@ const TrafficMarkerHoverStyle  = {
 const TrafficStickStyle  = {
     position: "absolute",
     opacity: 0.9,
-    top: -H_STICK,
-    height: H_STICK,
+    top: -H_STICK / 2.5,
+    height: H_STICK / 2.5,
     width: W_STICK,
     backgroundColor: 'green'
 };
@@ -85,6 +86,8 @@ class TrafficMarker extends React.Component {
 	const stickStyle = TrafficStickStyle
 	const markerStyle = TrafficMarkerStyle
 
+	console.log("clusters = ", this.props.clusters)
+
 	
 	// just because I can ;))
 	let clustersString = (() => {
@@ -96,19 +99,21 @@ class TrafficMarker extends React.Component {
 	    return s + "}";
 	})();
 
-	let clusterTable =
-	    <table><tbody>
-	    <tr><td>first sdf</td></tr>
-	    <tr><td>second line</td></tr>
+
+	let tableHTML =
+	    <table className="marker"><tbody>
+	    <tr><td>other cluster-1</td><td>90%</td></tr>
+      	    <tr><td>cluster-2</td><td>10%</td></tr>
 	    </tbody></table>
 
 	return (
 	    <div>
+	      <div style={circleStyle}/>
+	      <div style={stickStyle}/>
 	      <div style={markerStyle}>
 		<div>
-		  <b>some text</b><br/>
-		  <b>more text</b>
-		  <table><tbody><tr><td>first line</td></tr></tbody></table>
+		  <b>{this.props.text}</b><br/>
+		  {tableHTML}
 		</div>
 	      </div>
 	    </div>
@@ -148,6 +153,8 @@ class TrafficMap extends React.Component {
 	    signals
 	} = this.props;
 	//console.log("render(): signals = ", signals);
+
+	
 	return (
 	    <GoogleMapReact
 	      bootstrapURLKeys={{
