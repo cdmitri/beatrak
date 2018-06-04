@@ -68,4 +68,20 @@ rr-show:
 	kubectl get routerules
 
 rr-delete:
-	kubectl delete routerules stage1-rr-beacon
+	kubectl delete routerules beacon-to-service
+
+rr-create-1-prem-50-50:
+	kubectl create -f src/stage1/rr/work-07-clus/rr-prem-50-50.yaml
+
+rr-create-2-prem-1-only:
+	kubectl replace -f src/stage1/rr/work-07-clus/rr-prem-1-only.yaml
+
+rr-create-3-cloud-10-canary:
+	kubectl replace -f src/stage1/rr/work-07-clus/rr-cloud-10-canary.yaml
+
+
+rr-create-4-cloud-prem-50-50:
+	kubectl replace -f src/stage1/rr/work-07-clus/rr-cloud-prem-50-50.yaml
+
+
+
