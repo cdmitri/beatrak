@@ -1,4 +1,5 @@
-import React from "react";
+import React from "react"
+import "./ClusterTable.css"
 const moment = require("moment");
 
 class ClusterTable extends React.Component {
@@ -76,7 +77,7 @@ class ClusterTable extends React.Component {
 	
 	return (
 	    <div>
-     	      <table><tbody>
+     	      <table className="cluster"><tbody>
 	            <tr>
       		     <th>service</th>
 		     <th>traffic %</th>

@@ -1,4 +1,6 @@
-import React from "react";
+import React from "react"
+import "./SignalTable.css"
+
 const moment = require("moment");
 
 class SignalTable extends React.Component {
@@ -49,7 +51,7 @@ class SignalTable extends React.Component {
 		 return (
  	    <div>
 	      {/*	      <p>counter = {this.state.counter}</p> */}
-	      <table>
+	      <table className="signal">
 		  <tbody>
 	            <tr>
       		     <th>loc.name</th>
@@ -85,14 +87,14 @@ class SignalTable extends React.Component {
 		 return (
  	    <div>
 	      {/*	      <p>counter = {this.state.counter}</p> */}
-	      <table>
+	      <table className="signal">
 		  <tbody>
 	            <tr>
       		     <th>beacon</th>
 		     <th>service</th>
 		     <th>traffic %</th>
     		     <th>last</th>
-		  </tr>
+		   </tr>
 		    {signals.map(signal =>
 			       <tr key={signal.beacon_id + ":" + signal.stage1_id}>
 				     {/* <td key={signal.beacon_id + signal.stage_id}>lala</td> */}
