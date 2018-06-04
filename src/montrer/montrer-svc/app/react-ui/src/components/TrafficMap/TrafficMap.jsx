@@ -135,8 +135,9 @@ class TrafficMap extends React.Component {
 	
 	this.state = {
 	    //	    center: {lat: 50.8386789, lng: 4.32},
-	    center: {lat: 27.474023, lng: -81.460051},
-	    zoom: 7
+	    // center: {lat: 27.474023, lng: -81.460051},
+	    center: {lat: 28.089426, lng: -81.590549},
+	    zoom: 9
 	    //signals: null
 	};
     } // constructor
@@ -150,7 +151,6 @@ class TrafficMap extends React.Component {
 	//console.log("clusters = ", clusters);
 	return clusters;
     }
-
 
     getClustersAndPercent = (paths, signal) => {
 	console.log("<TrafficMap>: getClustersAndPercent(): signal = ", signal)
@@ -169,12 +169,12 @@ class TrafficMap extends React.Component {
 
 		let cluster = null
 		for (var ci in clusters) {
-		if(path.stage1_cluster === clusters[ci].stage1_cluster) {
-		    cluster = clusters[ci]
-		    clusters[ci].sp = parseInt(clusters[ci].sp,10) + parseInt(path.sp,10)
-		    clusters[ci].last_ts = path.last_ts
-		    break
-		}
+		    if(path.stage1_cluster === clusters[ci].stage1_cluster) {
+			cluster = clusters[ci]
+			clusters[ci].sp = parseInt(clusters[ci].sp,10) + parseInt(path.sp,10)
+			clusters[ci].last_ts = path.last_ts
+			break
+		    }
 		}
 		if(cluster == null) {
 		    clusters.push({stage1_cluster: path.stage1_cluster, sp: path.sp, last_ts: path.last_ts})
@@ -182,7 +182,18 @@ class TrafficMap extends React.Component {
 	    }
 	}
 
-	return clusters
+	// all the percentages are relative to the 100 of all the paths, so we need to normilize it to 100%
+	// for this beacon only
+	let total = clusters.reduce((sum, cluster) => {
+	    return sum + parseInt(cluster.sp,10)
+	}, 0)
+
+	let normalized = clusters.map(cluster => {
+	    cluster.sp = Math.round(cluster.sp / total * 100)
+	    return {stage1_cluster: cluster.stage1_cluster, sp: cluster.sp}
+	})
+
+	return normalized.sort()
     }
 
         

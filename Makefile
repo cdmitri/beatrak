@@ -79,7 +79,6 @@ rr-create-2-prem-1-only:
 rr-create-3-cloud-10-canary:
 	kubectl replace -f src/stage1/rr/work-07-clus/rr-cloud-10-canary.yaml
 
-
 rr-create-4-cloud-prem-50-50:
 	kubectl replace -f src/stage1/rr/work-07-clus/rr-cloud-prem-50-50.yaml
 

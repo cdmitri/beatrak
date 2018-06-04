@@ -81,7 +81,7 @@ class ClusterTable extends React.Component {
 	            <tr>
       		     <th>service</th>
 		     <th>traffic %</th>
-    		     <th>last cluster</th>
+    		     <th>last</th>
 		    </tr>
 		    {clusters.map(cluster =>
 			       <tr key={cluster.stage1_cluster + ":" + 10}>
