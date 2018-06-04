@@ -35,7 +35,6 @@ const TrafficMarkerHoverStyle  = {
     zIndex: 1000
 };
 
-
 const TrafficStickStyle  = {
     position: "absolute",
     opacity: 0.9,
@@ -86,7 +85,7 @@ class TrafficMarker extends React.Component {
 	const stickStyle = TrafficStickStyle
 	const markerStyle = TrafficMarkerStyle
 
-	console.log("clusters = ", this.props.clusters)
+//	console.log("clusters = ", this.props.clusters)
 
 	
 	// just because I can ;))
@@ -97,17 +96,22 @@ class TrafficMarker extends React.Component {
 		s += (cluster === "0" ? "" : ",") +  this.props.clusters[cluster];
 	    }
 	    return s + "}";
-	})();
+	})()
 
+
+//	let tableHTML =
+//	    <table className="marker"><tbody>
+//	    <tr><td>other cluster-1</td><td>90%</td></tr>
+//      	    <tr><td>cluster-2</td><td>10%</td></tr>
+//	    </tbody></table>
 
 	let tableHTML =
 	    <table className="marker"><tbody>
-	    <tr><td>other cluster-1</td><td>90%</td></tr>
-      	    <tr><td>cluster-2</td><td>10%</td></tr>
+	    {this.props.percent.map(cluster => <tr key={cluster.stage1_cluster}><td>{cluster.stage1_cluster}</td><td>{cluster.sp}</td></tr>)}
 	    </tbody></table>
 
 	return (
-	    <div>
+	   <div>
 	      <div style={circleStyle}/>
 	      <div style={stickStyle}/>
 	      <div style={markerStyle}>
@@ -147,7 +151,41 @@ class TrafficMap extends React.Component {
 	return clusters;
     }
 
-    
+
+    getClustersAndPercent = (paths, signal) => {
+	console.log("<TrafficMap>: getClustersAndPercent(): signal = ", signal)
+
+	let beaconName = signal.loc.name
+        console.log("<TrafficMap>: getClusterAnePercent(): beaconName = ", beaconName)
+	
+	//	let clusters = [{stage1_cluster: "cluser-1", sp : 85}, {stage1_cluster: "cluster-2", sp: 10}]
+	let clusters = []
+
+	for (var pi in paths) {
+	    let path = paths[pi]
+
+	    if(beaconName === path.loc.name) {
+		console.log("<TrafficMap>: getClusterAnePercent(): found path, stage1_cluster = ", path.stage1_cluster)
+
+		let cluster = null
+		for (var ci in clusters) {
+		if(path.stage1_cluster === clusters[ci].stage1_cluster) {
+		    cluster = clusters[ci]
+		    clusters[ci].sp = parseInt(clusters[ci].sp,10) + parseInt(path.sp,10)
+		    clusters[ci].last_ts = path.last_ts
+		    break
+		}
+		}
+		if(cluster == null) {
+		    clusters.push({stage1_cluster: path.stage1_cluster, sp: path.sp, last_ts: path.last_ts})
+		}
+	    }
+	}
+
+	return clusters
+    }
+
+        
     render() {
 	const {
 	    signals
@@ -168,7 +206,8 @@ class TrafficMap extends React.Component {
 			                lat={signal.loc.lonlat.split(',')[0]} 
 			                lng={signal.loc.lonlat.split(',')[1]} 
 				        text={signal.loc.name}
-					clusters={this.getClusters(signals,signal)}
+				        clusters={this.getClusters(signals,signal)}
+				        percent={this.getClustersAndPercent(signals,signal)}
 			                />
 			   )}
 			   
