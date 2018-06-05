@@ -51,7 +51,7 @@ beacon-delete-devshell:
 # STAGE1
 #
 
-stage1-build: TARGET=prod
+stage1-build: export TARGET=prod
 stage1-build:
 	$(MAKE) -C ${ROOT_SRC_DIR}/src/stage1 build
 

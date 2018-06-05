@@ -1,20 +1,44 @@
 table.marker {
     border-collapse: collapse;
-    margin-left: auto; 
+    margin-left: auto;
     margin-right: auto;
-    borderspacing: 5px; /* cellspacing */
-/*    margin-top: 50px; */
-/*    margin-bottom: 50px; */
-    border: 1px solid black;
-    padding: 5px; /* cellpadding */
+    align-self: center;
+/*    borderspacing: 0px; */
+    margin-top: 0px;
+    /*    margin-bottom: 50px; */
+    border: 0px solid black;
+    /*    padding: 0px; */
+    font-size: 14px;
 }
 
 table.marker td {
-    border: 1px solid black;
-    padding: 5px; /* cellpadding */
+    border: 1px solid black; 
+/*    padding: 5px; */
+    padding: 3px;
+}
+
+table.marker .cluster-name {
+    border: 1px solid black; 
+    /*    padding: 5px; */
+    padding: 3px;
+    text-align: left;
 }
 
 table.marker th {
     border: 1px solid black;
     padding: 5px; /* cellpadding */
+}
+
+.table-div {
+    display: flex;
+    justify-content: center;
+    border: 0px solid red;
+    height: 75%;
+}
+
+.beacon-name-div {
+    font-size: 14px;
+    margin-top: 4px;
+    padding: 0px;
+    border: 0px solid pink;
 }

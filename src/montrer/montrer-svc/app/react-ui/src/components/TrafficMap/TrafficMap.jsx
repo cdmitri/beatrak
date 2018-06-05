@@ -8,9 +8,9 @@ import "./TrafficMap.css"
 //const W_STICK = 3;
 //const R_CIRCLE = 8;
 
-const H_SIZE = 30*3;
+const H_SIZE = 35*3;
 const W_SIZE = 60*3;
-const H_STICK = 40*2;
+const H_STICK = 45*2 + 1;
 const W_STICK = 3;
 const R_CIRCLE = 8*2;
 
@@ -18,13 +18,13 @@ const TrafficMarkerStyle  = {
     position: "absolute",
     color: "black",
     background: "white",
-    opacity: 0.9,
+    opacity: 0.5,
     border: "2px solid green",
     textAlign: "center",
     height: H_SIZE,
     width: W_SIZE,
     top: -(H_SIZE / 2 + H_STICK),
-    left: -W_SIZE / 2
+    left: -W_SIZE / 2,
 }
 
 const TrafficMarkerHoverStyle  = {
@@ -49,7 +49,8 @@ const TrafficStickHoverStyle  = {
     width: W_STICK + 1,
     opacity: 1,
     cursor: "pointer",
-    zIndex: 1000
+    zIndex: 1000,
+    backgroundColor: "orange"
 };
 
 
@@ -71,19 +72,20 @@ const TrafficCircleHoverStyle  = {
     height: R_CIRCLE + 2,
     width: R_CIRCLE + 2,
     borderRadius: R_CIRCLE + 2,
-    zIndex: 1000
+    zIndex: 1000,
+    backgroundColor: "orange"
 }
 
 class TrafficMarker extends React.Component {
     render = () => {
-//	const circleStyle = this.props.$hover ? TrafficCircleHoverStyle : TrafficCircleStyle;
-//	const stickStyle = this.props.$hover ? TrafficStickHoverStyle : TrafficStickStyle;
-//	const markerStyle = this.props.$hover ? TrafficMarkerHoverStyle : TrafficMarkerStyle;
+	const circleStyle = this.props.$hover ? TrafficCircleHoverStyle : TrafficCircleStyle;
+	const stickStyle = this.props.$hover ? TrafficStickHoverStyle : TrafficStickStyle;
+	const markerStyle = this.props.$hover ? TrafficMarkerHoverStyle : TrafficMarkerStyle;
 
 
-	const circleStyle = TrafficCircleStyle
-	const stickStyle = TrafficStickStyle
-	const markerStyle = TrafficMarkerStyle
+//	const circleStyle = TrafficCircleStyle
+//	const stickStyle = TrafficStickStyle
+//	const markerStyle = TrafficMarkerStyle
 
 //	console.log("clusters = ", this.props.clusters)
 
@@ -106,19 +108,25 @@ class TrafficMarker extends React.Component {
 //	    </tbody></table>
 
 	let tableHTML =
+	    <div className="table-div">
 	    <table className="marker"><tbody>
-	    {this.props.percent.map(cluster => <tr key={cluster.stage1_cluster}><td>{cluster.stage1_cluster}</td><td>{cluster.sp}</td></tr>)}
+	    {this.props.percent.map(cluster =>
+				    <tr key={cluster.stage1_cluster}> 
+				    <td className="cluster-name">{cluster.stage1_cluster}</td>
+				    <td>{cluster.sp}%</td>
+				    </tr>)
+	    }
 	    </tbody></table>
-
+	    </div>
 	return (
 	   <div>
 	      <div style={circleStyle}/>
 	      <div style={stickStyle}/>
 	      <div style={markerStyle}>
-		<div>
-		  <b>{this.props.text}</b><br/>
-		  {tableHTML}
+		<div className="beacon-name-div">
+		  <b>{this.props.text}</b>
 		</div>
+		  {tableHTML}
 	      </div>
 	    </div>
 	)
