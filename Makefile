@@ -56,10 +56,10 @@ stage1-build:
 	$(MAKE) -C ${ROOT_SRC_DIR}/src/stage1 build
 
 stage1-create:
-	kubectl create -f src/stage1/rr/work-07-clus/stage1-service.yaml
+	kubectl create -f src/stage1/rr/work-08-clus/stage1-service.yaml
 
 stage1-delete:
-	kubectl delete -f src/stage1/rr/work-07-clus/stage1-service.yaml
+	kubectl delete -f src/stage1/rr/work-08-clus/stage1-service.yaml
 
 show:
 	kubectl get pods -Lapp,version,cluster,zone  --watch | grep clus-istio
@@ -71,16 +71,16 @@ rr-delete:
 	kubectl delete routerules beacon-to-service
 
 rr-create-1-prem-50-50:
-	kubectl create -f src/stage1/rr/work-07-clus/rr-prem-50-50.yaml
+	kubectl create -f src/stage1/rr/work-08-clus/rr-prem-50-50.yaml
 
 rr-create-2-prem-1-only:
-	kubectl replace -f src/stage1/rr/work-07-clus/rr-prem-1-only.yaml
+	kubectl replace -f src/stage1/rr/work-08-clus/rr-prem-1-only.yaml
 
 rr-create-3-cloud-10-canary:
-	kubectl replace -f src/stage1/rr/work-07-clus/rr-cloud-10-canary.yaml
+	kubectl replace -f src/stage1/rr/work-08-clus/rr-cloud-10-canary.yaml
 
 rr-create-4-cloud-prem-50-50:
-	kubectl replace -f src/stage1/rr/work-07-clus/rr-cloud-prem-50-50.yaml
+	kubectl replace -f src/stage1/rr/work-08-clus/rr-cloud-prem-50-50.yaml
 
 
 

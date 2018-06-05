@@ -1,0 +1,20 @@
+apiVersion: config.istio.io/v1alpha2
+kind: RouteRule
+metadata:
+  name: beacon-to-service
+spec:
+  destination:
+    name: service
+  match:
+   source:
+     name: beacon
+  route:
+  - labels:
+      cluster: orlando-service-1  
+    weight: 90
+  - labels:
+      cluster: orlando-service-2
+    weight: 0
+  - labels:
+      cluster: cloud-service-1
+    weight: 10
