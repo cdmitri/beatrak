@@ -1,0 +1,70 @@
+apiVersion: v1
+kind: Service
+metadata:
+    name: "beacon"
+    labels:
+      app: "beacon"
+      version: clus-istio
+spec:
+  ports:
+  - name: locpick-api
+    port: 50002
+    protocol: TCP
+    targetPort: 50002
+  - name: grpc
+    port: 51002
+    protocol: TCP
+    targetPort: 51001
+  - name: grpc-tls
+    port: 52002
+    protocol: TCP
+    targetPort: 52002
+  clusterIP:  None
+  selector:
+    app: "beacon"
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: "beacon"
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: "beacon"
+        cluster: ""
+        zone: "zfl"
+        version: clus-istio
+    spec:
+      containers:
+      - name: beacon
+        image: beatrak/beacon
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: "LOG_LEVEL"
+          value: "debug"
+        - name: "SERVICE_NAME"
+          value: "beacon"
+        - name: "ZONE"
+          value: "zfl"
+        - name: "BEACON_SIG_NUMBER"
+          value: "-1"
+        - name: "BEACON_SIG_PS"
+          value: "10"
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: "beacon"
+  annotations:
+    kubernetes.io/ingress.class: "istio"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /
+        backend:
+          serviceName: "beacon"
+          servicePort: 51234
+---

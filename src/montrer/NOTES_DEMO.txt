@@ -1,0 +1,56 @@
+WORK-06-prem-cloud - beacon source, prem-1, prem-2, cloud-1
+------------------
+
+cd ../locpick
+make k8s-delete-locpick-istio
+make k8s-create-locpick-istio
+
+
+cd ../beacon
+make k8s-build-beacon-istio-za
+make k8s-create-beacon-istio-za
+make k8s-delete-beacon-istio-za
+
+kubectl delete routerule stage1-rr-beacon
+cd ../stage1
+kubectl create -f  rr/work-06-prem-cloud/stage1-dep-istio-prem-cloud.yaml
+istioctl create -f rr/work-06-prem-cloud/stage1-rr-beacon-to-prem-1-50-prem-2-50.yaml
+istioctl replace -f rr/work-06-prem-cloud/stage1-rr-beacon-to-prem-1-100-prem-2-0.yaml
+istioctl replace -f rr/work-06-prem-cloud/stage1-rr-beacon-to-prem-1-90-prem-2-0-cloud-1-10.yaml
+
+$ kubectl create -f  rr/work-06-prem-cloud/stage1-dep-istio-prem-cloud.yaml
+service "stage1-dep-istio" created
+deployment.extensions "stage1-dep-istio-prem-1" created
+deployment.extensions "stage1-dep-istio-prem-2" created
+deployment.extensions "stage1-dep-istio-cloud-1" created
+ingress.extensions "stage1-dep-istio" created
+
+data processing stage1 can be done in any of the pools:
+prem-1, prem-2, could-1 are a "pool of data processing workers"
+
+cd ../montrer
+
+make k8s-build-envoy
+cd beatrak <--------
+make installgen
+cd src/montrer
+make k8s-create-envoy
+make k8s-delete-envoy
+
+make k8s-build-prod
+make k8s-create-prod
+make k8s-delete-prod
+
+grafana = 10.0.2.15:50004
+montrer = 10.0.2.15:50020
+
+// montrer devshell
+mongrer-devshell = 10.0.2.15:55020
+make k8s-build-devshell
+make k8s-create-devshell
+make k8s-shell-devshell
+make k8s-delete-devshell
+
+cd /root/beatrak/src/montrer/montrer-svc/app
+/start-dev.sh
+tail -f /root/beatrak/src/montrer/montrer-svc/app/react-ui/react-log.log

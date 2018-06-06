@@ -1,0 +1,6 @@
+locpick-devshell-istio.templ.original.yaml
+locpick-devshell-istio.yaml
+locpick-dep-istio.yaml
+locpick-msvc/protos/
+locpick-msvc/keys/
+locpick-msvc/common/
