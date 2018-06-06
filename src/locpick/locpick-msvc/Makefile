@@ -13,4 +13,4 @@ k8s-build-devshell:
 #
 # PROD
 k8s-build:
-	sudo docker build --file=Dockerfile --rm -t "${IMAGE_NAME}" .
+	sudo docker build --no-cache --file=Dockerfile --rm -t "${IMAGE_NAME}" .

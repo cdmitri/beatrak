@@ -3,11 +3,18 @@
 # $ TARGET=devshell make
 
 env:
+ifndef HOSTNAME
+	$(eval export HOSTNAME=$(shell hostname))
+	@echo "HOSTNAME="${HOSTNAME}
+endif
+
 ifndef ROOT_SRC_DIR
-	$(eval ROOT_SRC_DIR=$(abspath ${PWD}/..))
+	$(eval ROOT_SRC_DIR=$(abspath ${PWD}/../..))
 	@echo "ROOT_SRC_DIR="${ROOT_SRC_DIR}
 endif
 	$(eval export NODE_PATH=/usr/lib/node_modules)
+	@echo "NODE_PATH="${NODE_PATH}
+
 ifndef TARGET
 TARGET = devshell
 endif
@@ -70,6 +77,7 @@ k8s-build-prod:
 #
 k8s-build-beacon-za: env
 k8s-build-beacon-za: k8s-build-prod
+
 k8s-create-beacon-za: LOG_LEVEL=debug
 k8s-create-beacon-za: SERVICE_NAME=${TARGET}-ss-hlsvc
 k8s-create-beacon-za: APP=${SERVICE_NAME}
@@ -184,3 +192,99 @@ config-beacons:
 
 
 
+##
+## ISTIO
+##
+k8s-build-devshell-istio:
+	mkdir -p ./beacon-msvc/common/
+	cp -rf ../common/* ./beacon-msvc/common/
+	mkdir -p ./beacon-msvc/protos/
+	cp -rf ../protos/* ./beacon-msvc/protos/
+	mkdir -p ./beacon-msvc/keys/
+	cp -rf ../keys/* ./beacon-msvc/keys/
+	$(MAKE) -C ./beacon-msvc k8s-build-devshell
+
+k8s-create-devshell-istio: env
+k8s-create-devshell-istio: LOG_LEVEL=debug
+k8s-create-devshell-istio: SERVICE_NAME=beacon-devshell-istio
+k8s-create-devshell-istio: APP=${SERVICE_NAME}
+k8s-create-devshell-istio: BEATRAK_VOLUME_PATH=${ROOT_SRC_DIR}
+k8s-create-devshell-istio: 
+	${ROOT_SRC_DIR}/tools/templ.js --templ=${SERVICE_NAME}.templ.yaml --data='{ "service-name" : "${SERVICE_NAME}", "app" : "${APP}", "log-level" : "${LOG_LEVEL}", "hostname" : "${HOSTNAME}", "beatrak-volume-path" : "${BEATRAK_VOLUME_PATH}" }' --file=beacon-devshell-istio.yaml
+	kubectl create -f ./beacon-devshell-istio.yaml
+
+k8s-delete-devshell-istio: 
+	kubectl delete -f ./beacon-devshell-istio.yaml
+
+k8s-shell-devshell-istio: LOG_LEVEL=debug
+k8s-shell-devshell-istio: SERVICE_NAME=beacon-devshell-istio
+k8s-shell-devshell-istio:
+	mkdir -p ./beacon-msvc/common/
+	cp -rf ../common/* ./beacon-msvc/common/
+	mkdir -p ./beacon-msvc/protos/
+	cp -rf ../protos/* ./beacon-msvc/protos/
+	mkdir -p ./beacon-msvc/keys/
+	cp -rf ../keys/* ./beacon-msvc/keys/
+	kubectl exec -it $$(kubectl get pods -n default -o 'jsonpath={.items[?(@.metadata.labels.app=="beacon-devshell-istio")].metadata.name}') -c ${SERVICE_NAME} -- /bin/bash -l -c "LOG_LEVEL=$(LOG_LEVEL) exec -l /bin/bash"
+
+##
+## ISTIO BEACON-ZA
+##
+k8s-build-beacon-istio-za:
+	sudo mkdir -p ./beacon-msvc/common/
+	sudo cp -rf ../common/* ./beacon-msvc/common/
+	sudo mkdir -p ./beacon-msvc/protos/
+	sudo cp -rf ../protos/* ./beacon-msvc/protos/
+	sudo mkdir -p ./beacon-msvc/keys/
+	sudo cp -rf ../keys/* ./beacon-msvc/keys/
+	$(MAKE) -C ./beacon-msvc k8s-build
+
+k8s-create-beacon-istio-za: env
+k8s-create-beacon-istio-za: SERVICE_NAME=beacon-dep-istio
+k8s-create-beacon-istio-za: APP=${SERVICE_NAME}
+k8s-create-beacon-istio-za: REPLICAS=1
+k8s-create-beacon-istio-za: LOG_LEVEL=debug
+k8s-create-beacon-istio-za: CLUSTER=nocluster
+k8s-create-beacon-istio-za: ZONE=za
+k8s-create-beacon-istio-za: BEACON_SIG_NUMBER=-1
+k8s-create-beacon-istio-za: BEACON_SIG_PS=5
+k8s-create-beacon-istio-za:
+	${ROOT_SRC_DIR}/tools/templ.js --templ=beacon-dep-istio.templ.yaml --data='{"service-name" : "$(SERVICE_NAME)", "app" : "$(APP)", "replicas" : "$(REPLICAS)", "zone" : "$(ZONE)", "log-level" : "$(LOG_LEVEL)", "beacon-sig-number" : "$(BEACON_SIG_NUMBER)", "beacon-sig-ps": "$(BEACON_SIG_PS)" }' --file=${SERVICE_NAME}-${CLUSTER}-${ZONE}.yaml
+	kubectl create -f ./${SERVICE_NAME}-${CLUSTER}-${ZONE}.yaml
+
+k8s-delete-beacon-istio-za: SERVICE_NAME=beacon-dep-istio
+k8s-delete-beacon-istio-za: CLUSTER=nocluster
+k8s-delete-beacon-istio-za: ZONE=za
+k8s-delete-beacon-istio-za:
+	kubectl delete -f ./${SERVICE_NAME}-${CLUSTER}-${ZONE}.yaml
+
+##
+## ISTIO BEACON-ZFL
+##
+k8s-build-beacon-istio-zfl:
+	sudo mkdir -p ./beacon-msvc/common/
+	sudo cp -rf ../common/* ./beacon-msvc/common/
+	sudo mkdir -p ./beacon-msvc/protos/
+	sudo cp -rf ../protos/* ./beacon-msvc/protos/
+	sudo mkdir -p ./beacon-msvc/keys/
+	sudo cp -rf ../keys/* ./beacon-msvc/keys/
+	$(MAKE) -C ./beacon-msvc k8s-build
+
+k8s-create-beacon-istio-zfl: env
+k8s-create-beacon-istio-zfl: SERVICE_NAME=beacon
+k8s-create-beacon-istio-zfl: APP=${SERVICE_NAME}
+k8s-create-beacon-istio-zfl: REPLICAS=2
+k8s-create-beacon-istio-zfl: LOG_LEVEL=debug
+k8s-create-beacon-istio-zfl: CLUSTER=nocluster
+k8s-create-beacon-istio-zfl: ZONE=zfl
+k8s-create-beacon-istio-zfl: BEACON_SIG_NUMBER=-1
+k8s-create-beacon-istio-zfl: BEACON_SIG_PS=10
+k8s-create-beacon-istio-zfl:
+	${ROOT_SRC_DIR}/tools/templ.js --templ=beacon-dep-istio.templ.yaml --data='{"service-name" : "$(SERVICE_NAME)", "app" : "$(APP)", "replicas" : "$(REPLICAS)", "zone" : "$(ZONE)", "log-level" : "$(LOG_LEVEL)", "beacon-sig-number" : "$(BEACON_SIG_NUMBER)", "beacon-sig-ps": "$(BEACON_SIG_PS)" }' --file=${SERVICE_NAME}-${CLUSTER}-${ZONE}.yaml
+	kubectl create -f ./${SERVICE_NAME}-${CLUSTER}-${ZONE}.yaml
+
+k8s-delete-beacon-istio-zfl: SERVICE_NAME=beacon-dep-istio
+k8s-delete-beacon-istio-zfl: CLUSTER=nocluster
+k8s-delete-beacon-istio-zfl: ZONE=zfl
+k8s-delete-beacon-istio-zfl:
+	kubectl delete -f ./${SERVICE_NAME}-${CLUSTER}-${ZONE}.yaml

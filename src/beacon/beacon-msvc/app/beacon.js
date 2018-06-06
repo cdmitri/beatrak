@@ -18,10 +18,10 @@ const moment = require('moment');
 const log = require('loglevel');
 const axhttp = require("axios");
 const {promisify} = require("util");
-const utils = require("../common/utils.js");
+const utils = require("../../../common/utils.js");
 const m = utils.m
-const {sleep,expBackoff} = require("../common/utils.js")
-const common = require("../common/common.js")
+const {sleep,expBackoff} = require("../../../common/utils.js")
+const common = require("../../../common/common.js")
 const grpc = require("grpc")
 const getopt = require("node-getopt")
 const fs = require("fs")
@@ -37,7 +37,7 @@ const locpickProto = grpc.load(PROTO_PATH+"/locpick.proto").locpick
 const beaconProto = grpc.load(PROTO_PATH+"/beacon.proto").beacon
 
 gl.signal = {};
-gl.stage1BaseURL = `http://${common.HOST}:${common.STAGE1_PORT}`
+gl.stage1BaseURL = `http://${common.STAGE1_HOST}:${common.STAGE1_PORT}`
 gl.doWriteStage1 = false;
 // we're doing load balancing
 // so we don't want to wait for too long,
@@ -151,6 +151,15 @@ const initEnv = () => {
 	console.log("log: beacon.js: initEnv(): gl.locpickHttpHost = " + gl.locpickHttpHost)
     }
     
+    if(typeof process.env.LOCPICK_GRPC_HOST === 'undefined' || process.env.LOCPICK_GRPC_HOST == "") {
+	// 	gl.locpickGrpcHost = "localhost"
+	gl.locpickGrpcHost = gl.locpickHttpHost
+	console.log("log: beacon.js: initEnv(): LOCPICK_GRPC_HOST is undefined, gl.locpickGrpcHost = " + gl.locpickGrpcHost)
+    } else {
+	gl.locpickGrpcHost = process.env.LOCPICK_GRPC_HOST
+	console.log("log: beacon.js: initEnv(): gl.locpickGrpcHost = " + gl.locpickGrpcHost)
+    }
+
     if(typeof process.env.LOCPICK_GRPC_PORT === 'undefined' || process.env.LOCPICK_GRPC_PORT == "") {
 	gl.locpickGrpcPort = 8085
 	console.log("log: beacon.js: initEnv(): LOCPICK_GRPC_PORT is undefined, gl.locpickGrpcPort = " + gl.locpickGrpcPort)
@@ -158,15 +167,6 @@ const initEnv = () => {
 	gl.locpickGrpcPort = process.env.LOCPICK_GRPC_PORT
 	console.log("log: beacon.js: initEnv(): gl.locpickGrpcPort = " + gl.locpickGrpcPort)
     }
-
-    if(typeof process.env.LOCPICK_GRPC_HOST === 'undefined' || process.env.LOCPICK_GRPC_HOST == "") {
-	gl.locpickGrpcHost = "localhost"
-	console.log("log: beacon.js: initEnv(): LOCPICK_GRPC_HOST is undefined, gl.gl.locpickGrpcHost = " + gl.gl.locpickGrpcHost)
-    } else {
-	gl.locpickGrpcHost = process.env.LOCPICK_GRPC_HOST
-	console.log("log: beacon.js: initEnv(): gl.locpickGrpcHost = " + gl.locpickGrpcHost)
-    }
-    
 
     if(typeof process.env.LOCPICK_GRPC_TLS_PORT === 'undefined' || process.env.LOCPICK_GRPC_TLS_PORT == "") {
 	gl.locpickGrpcTlsPort = 8090
@@ -176,21 +176,12 @@ const initEnv = () => {
 	console.log("log: beacon.js: initEnv(): gl.locpickGrpcTlsPort = " + gl.locpickGrpcTlsPort)
     }
     
-    if(typeof process.env.LOCPICK_GRPC_HOST === 'undefined' || process.env.LOCPICK_GRPC_HOST == "") {
-	gl.locpickGrpcHost = "localhost"
-	console.log("log: beacon.js: initEnv(): LOCPICK_GRPC_HOST is undefined, gl.locpickGrpcHost = " + gl.locpickGrpcHost)
-    } else {
-	gl.locpickGrpcHost = process.env.LOCPICK_GRPC_HOST
-	console.log("log: beacon.js: initEnv(): gl.locpickGrpcHost = " + gl.locpickGrpcHost)
-    }
-
     gl.locpickHttpEndpoint = gl.locpickHttpHost + ":" + gl.locpickHttpPort
     console.log("log: beacon.js: initEnv(): gl.locpickHttpEndpoint = " + gl.locpickHttpEndpoint)
     gl.locpickGrpcEndpoint = gl.locpickGrpcHost + ":" + gl.locpickGrpcPort
     console.log("log: beacon.js: initEnv(): gl.locpickGrpcEndpoint = " + gl.locpickGrpcEndpoint)
     gl.locpickGrpcTlsEndpoint = gl.locpickGrpcHost + ":" + gl.locpickGrpcTlsPort
     console.log("log: beacon.js: initEnv(): gl.locpickGrpcTlsEndpoint = " + gl.locpickGrpcTlsEndpoint)
-
 
     //
     // TLS SECRETS
@@ -220,10 +211,10 @@ const initEnv = () => {
 
     if(typeof process.env.LOCPICK_TLS_CLIENT_CERT === 'undefined' || process.env.LOCPICK_TLS_CLIENT_CERT == "" ) {
 	gl.locpickTlsClientCert = KEY_PATH + "/client1-cert.pem"
-	console.log("log: locpick.js: initEnv(): LOCPICK_TLS_CLIENT_CERT is undefined, gl.locpickTlsClientCert = ", gl.locpickTlsClientCert)
+	console.log("log: beacon.js: initEnv(): LOCPICK_TLS_CLIENT_CERT is undefined, gl.locpickTlsClientCert = ", gl.locpickTlsClientCert)
     } else {
 	gl.locpickTlsClientCert = process.env.LOCPICK_TLS_CLIENT_CERT
-	console.log("log: locpick.js: initEnv(): gl.locpickTlsClientCert = ", gl.locpickTlsClientCert)
+	console.log("log: beacon.js: initEnv(): gl.locpickTlsClientCert = ", gl.locpickTlsClientCert)
     }
     
 }
@@ -278,14 +269,14 @@ const locpickHttpInfo = ( async(label) => {
 	info = response.data
 
     }).catch(error => {
-	log.error(m("beacon.js: init(): locpick catch(): GET url = "), url);
-	log.error(m("beacon.js: init(): locpick catch(): could not call locpick, error.message = ", error.message));
+	log.error(m("beacon.js: initHttpInfo(): locpick catch(): GET url = "), url);
+	log.error(m("beacon.js: initHttpInfo(): locpick catch(): could not call locpick, error.message = ", error.message));
 	if(error.response) {
-	    log.error(m("beacon.js: init(): locpick catch(): error.response.data =>\n"));
+	    log.error(m("beacon.js: initHttpInfo(): locpick catch(): error.response.data =>\n"));
 	    log.error(JSON.stringify(error.response.data, null, "\t"));
-	    log.error(m("beacon.js: init(): locpick catch(): error.response.status = ", error.response.status));
+	    log.error(m("beacon.js: initHttpInfo(): locpick catch(): error.response.status = ", error.response.status));
 	 }
-	 log.debug(m("beacon.js: init(): locpick catch(): exit(1)"));
+	 log.debug(m("beacon.js: initHttpInfo(): locpick catch(): exit(1)"));
 	 process.exit(1)
     })
 
@@ -293,6 +284,38 @@ const locpickHttpInfo = ( async(label) => {
 
 })
 
+const locpickHttpLoc = ( async(label) => {
+
+    var loc
+
+    // curl -XPUT locpick-dep-istio.default.svc.cluster.local:50001/za/locs?pretty
+    let url = "http://" + gl.locpickHttpEndpoint + "/" + gl.zone + "/locs"
+    log.debug(m("beacon.js: initHttpLoc(): locpick url = ", url))
+    
+    await axhttp.put("http://" + gl.locpickHttpEndpoint + "/" + gl.zone + "/locs").then(response => {
+	log.debug(m("beacon.js: initHttpLoc(): locpick gl.locpickHttpEndpoint = ", gl.locpickHttpEndpoint))
+	log.debug(m("beacon.js: initHttpLoc(): locpick PUT response.data =>\n"))
+	log.debug(JSON.stringify(response.data, null, "\t"));
+	log.debug(m("beacon.js: initHttpLoc(): locpick response.status = ", response.status))
+	log.debug(m("beacon.js: initHttpLoc(): locpick response.statusText = ", response.statusText));
+
+	loc = response.data
+
+    }).catch(error => {
+	log.error(m("beacon.js: initHttpLoc(): locpick catch(): GET url = "), url);
+	log.error(m("beacon.js: initHttpLoc(): locpick catch(): could not call locpick, error.message = ", error.message));
+	if(error.response) {
+	    log.error(m("beacon.js: initHttpLoc(): locpick catch(): error.response.data =>\n"));
+	    log.error(JSON.stringify(error.response.data, null, "\t"));
+	    log.error(m("beacon.js: initHttpLoc(): locpick catch(): error.response.status = ", error.response.status));
+	 }
+	 log.debug(m("beacon.js: initHttpLoc(): locpick catch(): exit(1)"));
+	 process.exit(1)
+    })
+
+    return loc
+
+})
 
 const locpickGrpcInfo = (label) => new Promise((resolve, reject) => {
     gl.locpickGrpcClient.info({ClientID: gl.sid, Label: label}, (error, response) => {
@@ -328,7 +351,9 @@ const getLoc = (zone, label) => new Promise((resolve, reject) => {
 		reject(error)
 	    } else {
 		log.debug(m("beacon.js: getLoc(): OK: gl.locpickGrpcTlsClient.info(): received response = " + JSON.stringify(response)))
-		resolve(response)
+		let loc = response
+		loc.locpickid = "tlsgrpc_locpickid"
+		resolve(loc)
 	    }
 	})
 	
@@ -336,8 +361,30 @@ const getLoc = (zone, label) => new Promise((resolve, reject) => {
     } else {
 	log.warn(m("beacon.js: WARNING: getLoc(): combination of grpc and tls is not implemeted for getting location, deferring to plain HTTP"))
 	// TODO: do http call here
-	let loc = {"name" : "brussels", "lonlat" : "50.8386789,4.2931938", "zone" : "za"}
-	resolve(loc)
+	// let loc = {"name" : "brussels", "lonlat" : "50.8386789,4.2931938", "zone" : "za"}
+	// let loc = await locpickHttpInfo("http-info-for-beacon")
+	locpickHttpLoc("http-info-for-beacon").then(loc => {
+	    log.info(m("beacon.js: getLoc(): loc.loc[zone] = ", loc.loc["zone"]))
+	    if (loc.loc["zone"] === gl.zone) {
+		log.info(m("beacon.js: getLoc(): OK: locpick http loc"))
+		loc.loc.locpickid = "http_locpickid"
+		resolve(loc.loc)
+	    } else {
+		log.error(m("beacon.js: getLoc(): ERROR: locpick http loc"))
+		reject(m("beacon.js: getLoc(): ERROR: locpick http loc"))
+	    }
+	}, err => {
+	    reject(m("beacon.js: getLoc(): ERROR: locpick http loc, err = " + err))
+	})
+
+	// do not pretty the output
+//	log.debug(m("beacon.js: getLoc(): http loc = " + JSON.stringify(loc)))
+//	if (info.Name == "locpick") {
+//	    log.info(m("beacon.js: getLoc(): OK: locpick http loc"))
+//	} else {
+//	    log.error(m("beacon.js: getLoc(): ERROR: locpick http loc"))
+//	}
+//	resolve(loc)
     }
 }) // promise
 
@@ -385,24 +432,162 @@ const init = (async () => {
 	
     }
     
-
     initServers()
 
     const loc = await getLoc(gl.zone, "get-loc-from-beacon-test")
     log.debug(m("beacon.js: init(): loc = " + JSON.stringify(loc)))
-    if (loc.Name == "locpick") {
-	log.info(m("beacon.js: init(): OK: locpick location"))
-    } else {
-	log.info(m("beacon.js: init(): ERROR: locpick location"))
-    }
     
     // fill out the signal that we'll use later
     gl.sid = gl.serviceName.replace(/-/gi,"_") + "_" + Math.random().toString(36).substring(8) + "_" + ZONE
-    gl.signal.locpickid = info.locpickid
+    gl.signal.locpickid = loc.locpickid
     gl.signal.beaconid = gl.sid
-    gl.signal.beaconzone = ZONE
-    gl.signal.loc = info.loc
+    gl.signal.beaconzone = gl.zone
+    gl.signal.loc = loc
     log.debug(m("beacon.js: init(): gl.signal = " + JSON.stringify(gl.signal)))
+
+
+    //
+    // ELASTIC
+    //
+
+    elastic = new elasticsearch.Client({
+	host: common.ELASTIC_HOST + ":" + common.ELASTIC_PORT,
+	log: "error"
+	// log: LOG_LEVEL,
+	// pingTimeout: 1000,
+	// requestTimeout: 1000, // when to report an error
+	// deadTimeout: 1000,
+	// maxRetries: 0 // this does work
+    });
+
+    let hasElastic = false;
+    while(!hasElastic) {
+	await elastic.ping({
+	    requestTimeout: 1000,
+	    maxRetries: 0 // control the retries in this loop
+	}).then(() => {
+	    log.debug(m("init(): elastic.ping(): success"));
+	    hasElastic = true;
+	}, (error) => {
+	    log.debug(m("init(): elastic.ping(): failed"));
+	});
+	await sleep(1000);
+    }
+
+    //
+    // create index (if necessary)
+    //
+    log.debug(m("init(): create /beacon index..."));
+    await elastic.indices.create({  
+	index: "beacon",
+	body: {
+	    "settings" : {
+		"number_of_shards" : 2,
+		"number_of_replicas" : 1
+	    },
+	    "mappings" : {
+		"explicit_types" : {
+		    "properties": {
+			"loc.name": {
+			    "type":"text",
+			    "fielddata":true
+			},
+			"beaconid": {
+			    "type":"text",
+			    "fielddata":true
+			}
+		    }
+		}
+	    }
+	}
+    })
+	.then((response,status) => {
+	    log.debug(m("init(): elastic.indices.create(): response =>"));
+	    log.debug(response);
+	    log.debug(m("init(): elastic.indices.create(): status =>"));
+	    log.debug(status);
+	}, error => {
+	    try {
+		if(typeof error.response === 'undefined') {
+		    log.debug(m("init(): elastic.indices.create(): got and undefined error.response"));
+		} else {
+		    JSON.parse(error.response);
+		    let response  = JSON.parse(error.response);
+		    if(response.error.type === "index_already_exists_exception") {
+			log.debug(m("init(): elastic.indices.create(): error(OK): index already exits, continue..."));
+		    } else {
+			log.debug(m("init(): elastic.indices.create(): error: got JSON response but unknown error.response =>"));
+			log.debug(error.response);
+		    }
+		}
+	    } catch (error) {
+		log.debug(m("init(): elastic.indices.create(): error: catch(): not a JSON error =>"));
+		log.debug(error);
+		log.debug(m("init(): elastic.indices.create(): error: catch(): this is a serious error, exit(1)"));
+		//process.exit(1);
+	    }
+	})
+	.catch (error => {
+	    log.debug(m("init(): elastic.indices.reate(): catch(): unkown general error =>"));
+	    log.debug(error);
+	});
+  
+    let record = {index: "beacon", type: "init"};
+    record.body = gl.signal;
+    record.body.timestamp = moment().format('YYYY-MM-DDTHH:mm:ssZ');
+    log.debug(m("init(): init record write: record = ", record));
+
+
+    //
+    // write init record
+    //
+    await elastic.index(record)
+	.then((response) => {
+	    log.debug(m("init(): elastic.index(): response =>"));
+	    log.debug(response);
+	}, error => {
+	    try {
+		// if the response not jason we'll be in catch
+		// JSON.parse(error); 
+		let response  = JSON.parse(error.response);
+		log.debug(m("init(): elastic.index(): error: got JSON response but unknown error =>"));
+		log.debug(error);
+		log.debug(m("init(): elastic.index(): error: this is a serious error, exit(1)"));
+		process.exit(1);
+	    } catch (error) {
+		log.debug(m("init(): elastic.index(): error: catch(): not a JSON error =>"));
+		log.debug(error);
+		log.debug(m("init(): elastic.index(): error: catch(): this is a serious error, exit(1)"));
+		process.exit(1);
+	    } 
+	})
+	.catch(error => {
+	    log.debug(m("init(): elastic.index(): catch(): unkown general error =>"));
+	    log.debug(error);
+	});
+
+    let ms = await expBackoff(1,1000); //sleep for 1000ms 
+
+    log.debug(m(`init(): waited for ${ms}(ms) before init finish`));   
+ 
+    // 
+    // STAGE1 init and stuff here
+    //
+    await pingStage1()
+    .then ((response) => {
+	log.debug(m("init(): OK: can reach stage1"));
+	log.debug(m("init(): OK: response =>"));
+	log.debug(response);
+	gl.doWriteStage1 = true;
+    })
+    .catch (error => {
+	log.error(m("init(): ERROR: can't reach stage1, error =>"));
+	log.error(error);
+	gl.doWriteStage1 = false;
+	//process.exit(1);
+    });
+
+    
 })
 
 const init_old_2 = (async () => {
@@ -529,7 +714,7 @@ const init_old = (async () => {
 
 
     elastic = new elasticsearch.Client({
-	host: common.HOST + ":" + common.ELASTIC_PORT,
+	host: common.ELASTIC_HOST + ":" + common.ELASTIC_PORT,
 	log: "error"
 	// log: LOG_LEVEL,
 	// pingTimeout: 1000,
@@ -778,9 +963,9 @@ const sendToStage1 = (baseURL, signal) => {
 		log.debug(error);
 //		log.debug(m("sendToStage1(): ERROR: error.response.data.error.error =>"));
 //		log.debug(error.response.data.error.error);  
-		if(typeof error.response.data === 'undefined') {
-		    log.debug(m("sendToStage1(): ERROR: envoy upstream must be done, reponse = " + response));
-		    reject("sendToStage1(): ERROR: evnoy upstream problem, response = " + response);
+		if(typeof error.response == 'undefined' || typeof error.response.data === 'undefined') {
+		    log.debug(m("sendToStage1(): ERROR: envoy upstream must be done, error.reponse = " + error.response));
+		    reject("sendToStage1(): ERROR: evnoy upstream problem, error.response = " + error.response);
 		} else {
 		    log.debug(m("sendToStage1(): ERROR: error.response.data =>"));
 		    log.debug(error.response.data);
@@ -851,13 +1036,143 @@ const main = (async () => {
 	    process.exit(1);
 	}) 
 
-    console.log("debug: beacon.js: main(): after init()")
-    
     log.info(m("beacon.js: main(): OK: init done"))
-    while(true) {
-	log.info(m("beacon.js: main(): sleeping..."));
+
+    let signalCount = -1;
+    let isElasticReady = false;
+    let doBackoff = false;
+    let record;
+    let stage1BackoffCount = 0;
+
+    log.debug(m(`init(): signal loop: starting loop: signalCount = ${signalCount}, BEACON_SIG_NUMBER = ${BEACON_SIG_NUMBER}, BEACON_SIG_PAUSE = ${BEACON_SIG_PAUSE}`));
+    //    while(true) {
+    //	log.info(m("beacon.js: main(): sleeping..."));
+    //	await sleep(BEACON_SIG_PAUSE);
+    //    }
+
+
+    //
+    // LOOP START
+    //
+
+    while(BEACON_SIG_NUMBER == -1 || signalCount++ < BEACON_SIG_NUMBER - 1) {
+	log.trace(m(`init(): signal loop: signalCount = ${signalCount}, BEACON_SIG_NUMBER = ${BEACON_SIG_NUMBER}, BEACON_SIG_PAUSE = ${BEACON_SIG_PAUSE}`));
+
+	if(doBackoff) {
+	    isElasticReady = false;
+	    let backoffCount = 1;
+	    let backoffMS = 0;
+	    while(!isElasticReady) {
+		log.debug(m(`signal loop: backoff loop: backoff for ${BEACON_BACKOFF_SLEEP}(ms)`));
+		await expBackoff(backoffCount, BEACON_BACKOFF_SLEEP)
+		.then((ms) => {
+		    log.debug(m("signal loop: backoff loop: expBackoff() done"));
+		    log.debug(m(`signal loop: backoff loop: expBackoff() waited for ${ms}(ms)`));
+		    // process.exit(1);
+		    backoffMS += ms;
+		})
+		.catch(error => {
+		    log.error(m("signal loop: backoff loop: expBackoff() error =>"));
+		    log.error(error);
+		    process.exit(1);
+		}); 
+
+		await elastic.ping({
+		    requestTimeout: 1000,
+		    maxRetries: 0 // control the retries in this loop
+		}).then(() => {
+		    log.debug(m("signal loop: backoff loop: elastic.ping(): success"));
+		    isElasticReady = true;
+		}, (error) => {
+		    log.debug(m("signal loop: backoff loop: elastic.ping(): failed"));
+		    isElasticReady = false;
+		});
+	    }
+
+	    // write a backoff record
+	    record = {index: "beacon", type: "backoff"};
+	    record.body = gl.signal;
+	    record.body.timestamp = moment().format('YYYY-MM-DDTHH:mm:ssZ');
+	    record.body.backoffSeconds = backoffMS / 1000;
+	    log.trace(m("signal loop: backoff record write: record = ", record));
+
+	    //
+	    // write backoff record
+	    //
+	    await elastic.index(record)
+		.then((response, status) => {
+		    log.debug(m("signal loop: OK: wrote backoff record: elastic.index(): response =>"));
+		    log.debug(response);
+		    log.debug(m("signal loop: OK: wrote backoff record: elastic.index.create(): status =>"));
+		    doBackoff = false;
+		})
+		.catch(error => {
+		    log.debug(m("signal loop: ERROR: couldn't write backoff record: elastic.index(): catch(): unkown general error =>"));
+		    log.debug(error);
+		    log.debug(m("signal loop: ERROR: couldn't write backoff record: elastic.index(): catch(): do backoff"));
+		    doBackoff = true;
+		});
+	} else {
+
+	    gl.signal.beacon_timestamp = moment().format('YYYY-MM-DDTHH:mm:ssZ');
+
+	    //
+	    // send signal to stage1
+	    //
+	    if(gl.doWriteStage1) {
+		await sendToStage1(gl.stage1BaseURL, gl.signal)
+		    .then(response => {
+		    })
+		    .catch(error => {
+			//log.debug(m("signal loop: ERROR: couldn't write stage1 record: catch(): unkown general error =>"));
+			log.debug(m(`signal loop: ERROR: couldn't write stage1 record: catch(): skip/backoff => ${gl.stage1BackoffNumber} cycles`));
+			//log.debug(error);
+			gl.doWriteStage1 = false;
+		    });
+	    } else {
+		    // log.debug(m("signal loop: ERROR: Stage1 is not reachable, skip."));
+		if(gl.stage1BackoffNumber > stage1BackoffCount) {
+		    stage1BackoffCount++;
+		    //log.debug(m(`signal loop: ERROR: gl.stage1BackoffNumber = ${gl.stage1BackoffNumber}`));
+		    //log.debug(m(`signal loop: ERROR: stage1BackoffCount = ${stage1BackoffCount}`));
+		} else {
+		    stage1BackoffCount = 0;
+		    gl.doWriteStage1 = true;
+		}
+	    }
+
+	    //
+	    // write signal record
+	    //
+	    gl.signal.timestamp = gl.signal.beacon_timestamp;
+	    record = {index: "beacon", type: "signal"};
+	    record.body = gl.signal;
+	    log.trace(m("signal loop: signal record write: record = ", record));
+	    await elastic.index(record)
+		.then((response) => {
+		    log.trace(m("signal loop: OK: elastic.index(): wrote /beacon/signal record"));
+		    log.trace(m("signal loop: elastic.index(): response =>"));
+		    log.trace(response);
+		    doBackoff = false;
+		})
+		.catch(error => {
+		    log.debug(m("signal loop: ERROR: elastic.index(): catch(): could not write /beacon/signal record"));
+		    log.debug(m("signal loop: ERROR: elastic.index(): catch(): unkown general error =>"));
+		    log.debug(error);
+		    log.debug(m("signal loop: elastic.index(): catch(): do backoff"));
+		    doBackoff = true;
+		})
+	}
 	await sleep(BEACON_SIG_PAUSE);
     }
+
+    //
+    // LOOP END
+    //    
+
+
+
+
 
     log.info(m("beacon.js: main(): done"))
     

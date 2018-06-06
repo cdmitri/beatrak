@@ -11,13 +11,12 @@
 	"testEnvironment": "node"
     },
     "scripts": {
-	"start": "node locpick.js",
+	"start": "LOG_LEVEL=debug LOCPICK_HTTP_PORT=50001 LOCPICK_GRPC_PORT=51001 LOCPICK_GRPC_TLS_PORT=52001 node locpick.js",
 	"test": "jest --watchAll"
     },
     "dependencies": {
 	"axios": "^0.17.1",
 	"express": "^4.13.3",
-	"grpc": "1.10.1",
 	"jest": "^21.2.1",
 	"loglevel": "^1.6.1",
 	"moment": "^2.19.2",

@@ -7,7 +7,7 @@ metadata:
 spec:
   ports:
   - name: elastic-api
-    port: 9200
+    port: 50003
     protocol: TCP
     targetPort: 50003
   - name: envoy-admin
@@ -30,13 +30,15 @@ spec:
     metadata:
       labels:
         app: elastic-envoy
+      annotations:
+        sidecar.istio.io/inject: "false"
     spec:
       containers:
       - name: elastic-envoy
         image: beatrak/elastic-envoy
         imagePullPolicy: IfNotPresent
         ports:
-          - containerPort: 9200
+          - containerPort: 50003
             name: elastic-api
             protocol: TCP
           - containerPort: 50011

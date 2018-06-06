@@ -25,7 +25,7 @@ teardown() {
     run_beaplane
     waitforpass $LOGFILE \
 		"manager listening" \
-		20 true
+		30 true
 }
 
 @test "test-envoy-run" {

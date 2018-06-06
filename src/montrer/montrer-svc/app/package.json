@@ -3,13 +3,9 @@
     "version": "0.0.0",
     "private": true,
     "scripts": {
-	"start_older": "node ./bin/www",
-	"start_old": "PORT=50010 node montrer-server.js",
-	"trace": "DEBUG=montrer,montrer_trace:* PORT=50010 nodemon montrer-server.js",
-	"express-dev": "rm ~/app/express-*.log; DEBUG=montrer:* PORT=50010 forever start -l ~/app/express-log.log -o ~/app/express-out.log -e ~/app/express-error.log -c '/usr/bin/nodemon --exitcrash' montrer-server.js",
-	"start": "rm ~/app/express-*.log; PORT=50010 forever start -l ~/app/express-log.log -o ~/app/express-out.log -e ~/app/express-error.log montrer-server.js",
-	"start_block": "PORT=50010 node montrer-server.js",
-	"express-dev-stop": "forever stopall"
+	"express-dev": "rm -f /root/beatrak/logs/express-*.log; DEBUG=montrer:* PORT=50010 forever start -l /root/beatrak/logs/express-log.log -o /root/beatrak/logs/express-out.log -e /root/beatrak/logs/express-error.log -c '/usr/bin/nodemon --exitcrash' montrer-server.js",
+	"express-dev-stop": "forever stopall",
+	"start": "rm -f /root/beatrak/logs/express-*.log; PORT=50010 forever start -l /root/beatrak/logs/express-log.log -o /root/beatrak/logs/express-out.log -e /root/beatrak/logs/express-error.log montrer-server.js"
     },
     "dependencies": {
 	"body-parser": "~1.18.2",

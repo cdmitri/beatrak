@@ -2,10 +2,9 @@ FROM beatrak/node-base
 
 ENV PS1="[beatrak/beacon-devshell]# "
 
-RUN mkdir -p /root/app
-RUN mkdir -p /root/common
+RUN mkdir -p /root/beatrak
 
-WORKDIR /root/app
+WORKDIR /root/beatrak
 
 EXPOSE 8080
 

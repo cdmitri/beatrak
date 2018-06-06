@@ -13,9 +13,7 @@ spec:
   type: ClusterIP
   selector:
     app: postgresql-dep-svc
-
 ---
-
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
@@ -26,6 +24,8 @@ spec:
     metadata:
       labels:
         app: postgresql-dep-svc
+      annotations:
+        sidecar.istio.io/inject: "false"
     spec:
       containers:
       - name: beatrak-postgresql-latest

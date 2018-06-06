@@ -39,6 +39,8 @@ spec:
     metadata:
       labels:
         app: {{ app }}
+      annotations:
+        sidecar.istio.io/inject: "false"
     spec:
       containers:
       - name: montrer
@@ -50,17 +52,12 @@ spec:
           - name: "SERVICE_NAME"
             value: {{ service-name }}
         volumeMounts:
-          - mountPath: /root/app
-            name: app-volume
-          - mountPath: /root/common
-            name: common-volume
+          - mountPath: /root/beatrak
+            name: beatrak-volume
       volumes:
-        - name: app-volume
+        - name: beatrak-volume
           hostPath:
-            path: {{ app-volume-path }}
-        - name: common-volume
-          hostPath:
-            path: {{ common-volume-path }}
+            path: {{ beatrak-volume-path }}
       nodeSelector:
         kubernetes.io/hostname: {{ hostname }}
 

@@ -6,13 +6,14 @@ export EXT_SVC_NODEPORT :=
 
 # Set EXT_SVC_IP=<IP addr> to generate external services' IP
 #    Ex: "make ... EXT_SVC_IP=10.138.0.21"
-export EXT_SVC_IP := 10.0.2.15
+export EXT_SVC_IP := 10.138.0.4
 
 all:
+env: 
+	$(eval export NODE_PATH=$(shell npm get prefix)/lib/node_modules:${ROOT_SRC_DIR}/src/common)
 
 
 build-all:
-	cd src
 	$(MAKE) node-base-build
 	$(MAKE) common-build
 	$(MAKE) locpick-build
@@ -30,158 +31,13 @@ installgen:
 	-$(MAKE) grafana-installgen
 	-$(MAKE) montrer-installgen
 
-create-all:
-	-$(MAKE) elastic-create
-	-$(MAKE) postgresql-create
-	-$(MAKE) postgresql-gen
-	-$(MAKE) grafana-create
-	-$(MAKE) locpick-create
-	-$(MAKE) beacon-create-za
-	-$(MAKE) stage1-create-cla
-	-$(MAKE) stage1-create-clb
-	-$(MAKE) montrer-envoy-create
-	-$(MAKE) montrer-create
-
-test-all:
-	-$(MAKE) test-api
-
-test-api:
-	-$(MAKE) -C ./test/api  test-api
-
-delete-all:
-	-$(MAKE) montrer-delete
-	-$(MAKE) montrer-envoy-delete
-	-$(MAKE) stage1-delete-cla
-	-$(MAKE) stage1-delete-clb
-	-$(MAKE) beacon-delete-za
-	-$(MAKE) beacon-delete-zb
-	-$(MAKE) locpick-delete
-	-$(MAKE) grafana-delete
-	-$(MAKE) postgresql-delete
-	-$(MAKE) elastic-delete
-	@echo "BEATRAK DELETE FINISHED"
 
 #
+# COMMON
 #
-#
-env: 
-	$(eval export NODE_PATH=$(shell npm get prefix)/lib/node_modules:${ROOT_SRC_DIR}/src/common)
+common-build:
+	cd ${ROOT_SRC_DIR}/src/common; yarn install
 
-
-#
-# should be installed prior really
-# GCC 8
-#sudo yum install -y libmpc-devel mpfr-devel gmp-devel
-#sudo yum install -y zlib-devel*
-#sudo curl -sS https://ftp.gnu.org/gnu/gcc/gcc-8.1.0/gcc-8.1.0.tar.gz > /tmp/gcc.tgz; cd /tmp; tar -zxf gcc.tgz; cd /tmp/gcc-8.1.0; ./configure --with-system-zlib --disable-multilib --enable-languages=c,c++; sudo make; sudo make install
-# CMAKE 3.6
-#sudo curl -sS "https://copr.fedorainfracloud.org/coprs/vbatts/bazel/repo/epel-7/vbatts-bazel-epel-7.repo" -o /etc/yum.repos.d/vbatts-bazel-epel-7.repo
-#sudo curl -sS https://cmake.org/files/v3.6/cmake-3.6.2.tar.gz > /tmp/cmake.tgz; cd /tmp; tar -zxf cmake.tgz; cd /tmp/cmake-3.6.2; sudo ./bootstrap --prefix=/usr/local; sudo make install
-
-#
-# BAZEL
-#
-#curl -O -J -L https://github.com/bazelbuild/bazel/releases/download/0.13.0/bazel-0.13.0-installer-linux-x86_64.sh
-
-#
-# ENVOY
-#
-envoy-get:
-	mkdir -p ~/src/github.com/envoyproxy
-	cd ~/src/github.com/envoyproxy; git clone https://github.com/envoyproxy/envoy; git checkout -b v1.6.0  || true
-
-	cd ~/src/github.com/envoyproxy/envoy; bazel build --package_path %workspace%:~/src/github.com/envoyproxy/envoy //source/exe:envoy-static
-
-# ~/src/github.com/envoyproxy/envoy
-
-#
-# BEAPLANE
-#
-# TODO: add glide installation
-beaplane-prereq:
-#	go get github.com/envoyproxy/go-control-plane/envoy/api/v2
-#	go get github.com/sirupsen/logrus
-#	go get gopkg.in/yaml.v2
-#	sudo npm install --global npm
-#	sudo npm install --global forever
-	mkdir -p ~/go/bin
-	export GOPATH=~/go
-	curl https://glide.sh/get | sh
-
-
-beaplane-build: beaplane-prereq
-	-$(MAKE) -C src/beaplane build
-
-beaplane-test: beaplane-prereq
-	-$(MAKE) -C src/beaplane test
-#	-$(MAKE) -C src/obus/test test
-
-beapane-test:
-
-#
-# BEACONS
-#
-create-beacon-za:
-	$(MAKE) -C beacon TARGET=beacon-za create
-
-create-beacon-zb:
-	$(MAKE) -C beacon TARGET=beacon-zb create
-
-create-beacons: create-beacon-za create-beacon-zb
-
-delete-beacon-za:
-	$(MAKE) -C beacon TARGET=beacon-za delete
-
-delete-beacon-zb:
-	$(MAKE) -C beacon TARGET=beacon-zb delete
-
-delete-beacons: delete-beacon-za delete-beacon-zb
-
-build-beacons:
-	$(MAKE) -C beacon build
-
-#
-# ENVOY_CONFIG
-#
-# We have the defaults, but can be ran as 
-# $ make config-beacons
-# $ ENVOY_CONFIG_NAME=envoy-new make config-beacons
-# $ ENVOY_CONFIG_FILE = ./beacon/envoy-configs/envoy-new.json
-#
-# vaild configs:
-# - ENVOY_CONFIG_NAME=envoy-default make config-beacons
-#	. 50:50 between cla:clb for all beacons
-# - ENVOY_CONFIG_NAME=envoy-skew make config-beacons
-#       . 10:90 between cla:clb for all beacons
-# - ENVOY_CONFIG_NAME=envoy-zonetocluster make config-beacons
-#       . routes with prefixes /za->cla, /zb->clb
-ifndef ENVOY_CONFIG_NAME 
-ENVOY_CONFIG_NAME=envoy-new
-endif
-
-ifndef ENVOY_CONFIG_FILE
-ENVOY_CONFIG_FILE=${ROOT_SRC_DIR}/src/beacon/envoy-configs/${ENVOY_CONFIG_NAME}.json
-endif
-
-config-beacons: env
-config-beacons:
-	LOG_LEVEL=DEBUG CONFIG_FILE=${ENVOY_CONFIG_FILE} ${ROOT_SRC_DIR}/scripts/config-beacons.js
-
-#
-# ELASTIC
-#
-# TODO: automate later
-#elastic-node-0                            1/1       Running   33         3d        192.168.0.5    k8s-kubeadm-node-01
-#elastic-node-1                            1/1       Running   53         3d        192.168.0.7    k8s-kubeadm-node-01
-elastic-reset: ELASTIC_URL_0=http://10.32.0.7:9200
-elastic-reset: ELASTIC_URL_1=http://10.32.0.8:9200
-elastic-reset:
-	-curl -XPOST '$(ELASTIC_URL_0)/beacon/_delete_by_query?pretty' -d' { "query": { "match_all": {} } }'
-	-curl -XPOST '$(ELASTIC_URL_1)/beacon/_delete_by_query?pretty' -d' { "query": { "match_all": {} } }'
-
-#
-# TOP build targets
-#
 
 #
 # NODE-BASE
@@ -193,105 +49,6 @@ node-base-build:
 node-base-clean:
 	$(MAKE) -C ${ROOT_SRC_DIR}/src/node-base/alpine-node clean
 	$(MAKE) -C ${ROOT_SRC_DIR}/src/node-base clean
-
-#
-# COMMON
-#
-common-build:
-	cd ${ROOT_SRC_DIR}/src/common; yarn install
-
-#
-# LOCPICK
-#
-
-locpick-build: export TARGET=prod
-locpick-build:
-	$(MAKE) -C ${ROOT_SRC_DIR}/src/locpick build
-
-locpick-create: export TARGET=prod
-locpick-create:
-	$(MAKE) -C ${ROOT_SRC_DIR}/src/locpick create
-
-locpick-delete: export TARGET=prod
-locpick-delete:
-	$(MAKE) -C ${ROOT_SRC_DIR}/src/locpick delete
-
-locpick-reset: env
-	LOG_LEVEL=DEBUG ./scripts/reset-locpicks.js
-
-locpick-build-devshell:
-	$(MAKE) -C ${ROOT_SRC_DIR}/src/locpick build-devshell
-
-locpick-run-devshell:
-	$(MAKE) -C ${ROOT_SRC_DIR}/src/locpick run-devshell
-
-locpick-create-devshell:
-	$(MAKE) -C ${ROOT_SRC_DIR}/src/locpick create-devshell
-
-locpick-delete-devshell:
-	$(MAKE) -C ${ROOT_SRC_DIR}/src/locpick delete-devshell
-
-
-#
-# BEACON
-#
-
-beacon-build: export TARGET=prod
-beacon-build:
-	$(MAKE) -C ${ROOT_SRC_DIR}/src/beacon build
-
-# ZA
-beacon-create-za: export TARGET=beacon-za
-beacon-create-za:
-	$(MAKE) -C ${ROOT_SRC_DIR}/src/beacon create
-beacon-delete-za: export TARGET=beacon-za
-beacon-delete-za:
-	$(MAKE) -C ${ROOT_SRC_DIR}/src/beacon delete
-
-# ZB
-beacon-create-zb: export TARGET=beacon-zb
-beacon-create-zb:
-	$(MAKE) -C ${ROOT_SRC_DIR}/src/beacon create
-beacon-delete-zb: export TARGET=beacon-zb
-beacon-delete-zb:
-	$(MAKE) -C ${ROOT_SRC_DIR}/src/beacon delete
-
-#
-# BEACON CONFIGS
-#
-beacon-config-default: export ENVOY_CONFIG_NAME=envoy-default
-beacon-config-default: config-beacons
-
-beacon-config-skew: export ENVOY_CONFIG_NAME=envoy-skew
-beacon-config-skew: config-beacons
-
-beacon-config-zonetocluser: export ENVOY_CONFIG_NAME=envoy-zonetocluster
-beacon-config-zonetocluser: config-beacons
-
-
-#
-# STAGE1
-#
-
-stage1-build: export TARGET=prod
-stage1-build:
-	$(MAKE) -C ${ROOT_SRC_DIR}/src/stage1 build
-
-# STAGE1-CLA
-stage1-create-cla: export TARGET=stage1-cla
-stage1-create-cla:
-	$(MAKE) -C ${ROOT_SRC_DIR}/src/stage1 create
-stage1-delete-cla: export TARGET=stage1-cla
-stage1-delete-cla:
-	$(MAKE) -C ${ROOT_SRC_DIR}/src/stage1 delete
-
-# STAGE1-CLB
-stage1-create-clb: export TARGET=stage1-clb
-stage1-create-clb:
-	$(MAKE) -C ${ROOT_SRC_DIR}/src/stage1 create
-stage1-delete-clb: export TARGET=stage1-clb
-stage1-delete-clb:
-	$(MAKE) -C ${ROOT_SRC_DIR}/src/stage1 delete
 
 #
 # ELASTIC
@@ -309,6 +66,7 @@ elastic-delete:
 elastic-installgen: env
 	$(MAKE) -C ${ROOT_SRC_DIR}/src/elastic k8s-installgen
 
+
 #
 # GRAFANA
 #
@@ -325,8 +83,9 @@ grafana-delete:
 grafana-installgen: env
 	$(MAKE) -C ${ROOT_SRC_DIR}/src/grafana k8s-installgen
 
+
 #
-# POSTGRES
+# POSTGRESQL
 #
 
 postgresql-build:
@@ -381,3 +140,108 @@ montrer-delete:
 
 montrer-installgen: env
 	$(MAKE) -C ${ROOT_SRC_DIR}/src/montrer k8s-installgen
+
+#
+# MONTRER-DEVSHELL
+#
+# cd cd src/montrer
+# make k8s-build-devshell
+# make k8s-create-devshell
+# make k8s-shell-devshell
+# make k8s-delete-devshell
+#
+
+
+#
+# KEYS/CERTS
+#
+keys: 
+	$(MAKE) -C ${ROOT_SRC_DIR}/src/keys all
+
+
+#
+# LOCPICK
+#
+locpick-build: common-build
+	cd ${ROOT_SRC_DIR}/src/locpick/locpick-msvc/app; yarn; cd -
+	$(MAKE) -C ${ROOT_SRC_DIR}/src/locpick k8s-build-locpick-istio
+
+locpick-create:
+	$(MAKE) -C ${ROOT_SRC_DIR}/src/locpick k8s-create-locpick-istio
+
+locpick-delete:
+	$(MAKE) -C ${ROOT_SRC_DIR}/src/locpick k8s-delete-locpick-istio
+
+
+#
+# BEACON
+#
+
+beacon-build: common-build
+	cd ${ROOT_SRC_DIR}/src/beacon/beacon-msvc/app; yarn
+	$(MAKE) -C ${ROOT_SRC_DIR}/src/beacon k8s-build-beacon-istio-zfl
+
+beacon-create:
+	$(MAKE) -C ${ROOT_SRC_DIR}/src/beacon k8s-create-beacon-istio-zfl
+
+beacon-delete:
+	$(MAKE) -C ${ROOT_SRC_DIR}/src/beacon k8s-delete-beacon-istio-zfl
+
+# devshell
+beacon-build-devshell:
+	$(MAKE) -C ${ROOT_SRC_DIR}/src/beacon k8s-build-devshell-istio
+
+beacon-create-devshell:
+	$(MAKE) -C ${ROOT_SRC_DIR}/src/beacon k8s-create-devshell-istio
+
+beacon-shell-devshell:
+	$(MAKE) -C ${ROOT_SRC_DIR}/src/beacon k8s-shell-devshell-istio
+
+beacon-delete-devshell:
+	$(MAKE) -C ${ROOT_SRC_DIR}/src/beacon k8s-delete-devshell-istio
+
+#
+# STAGE1
+#
+
+stage1-build: export TARGET=prod
+stage1-build: common-build
+stage1-build:
+	cd ${ROOT_SRC_DIR}/src/stage1/stage1-msvc/app; yarn; cd -
+	$(MAKE) -C ${ROOT_SRC_DIR}/src/stage1 build
+
+stage1-create:
+	kubectl create -f src/stage1/rr/work-08-clus/stage1-service.yaml
+
+stage1-delete:
+	kubectl delete -f src/stage1/rr/work-08-clus/stage1-service.yaml
+
+
+###-----------------------------------------------------------------------------
+### CLUS
+###-----------------------------------------------------------------------------
+
+
+show:
+	kubectl get pods -Lapp,version,cluster,zone  --watch | grep clus-istio
+
+rr-show:
+	kubectl get routerules
+
+rr-delete:
+	kubectl delete routerules beacon-to-service
+
+rr-create-1-prem-50-50:
+	kubectl create -f src/stage1/rr/work-08-clus/rr-prem-50-50.yaml
+
+rr-create-2-prem-1-only:
+	kubectl replace -f src/stage1/rr/work-08-clus/rr-prem-1-only.yaml
+
+rr-create-3-cloud-10-canary:
+	kubectl replace -f src/stage1/rr/work-08-clus/rr-cloud-10-canary.yaml
+
+rr-create-4-cloud-prem-50-50:
+	kubectl replace -f src/stage1/rr/work-08-clus/rr-cloud-prem-50-50.yaml
+
+
+

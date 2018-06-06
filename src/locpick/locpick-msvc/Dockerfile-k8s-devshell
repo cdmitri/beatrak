@@ -1,21 +1,17 @@
 FROM beatrak/node-base
 
-RUN mkdir -p /root/app
-RUN mkdir -p /root/common
+ENV PS1="[beatrak/locpick-devshell]# "
 
-WORKDIR /root/app
+RUN mkdir -p /root/beatrak
 
-EXPOSE 8080
-
-# this we need to call with below and then run
-# /root/app/start-dev.sh
-# k8s-shell:
-#	kubectl exec ${CONTAINER_NAME_DEV} -i -t -- /bin/bash
+WORKDIR /root/beatrak
 
 COPY ./waitloop.sh ./start-dev.sh /
-ADD ./app/node_modules/jest /root/app/node_modules/jest 
 RUN chmod a+x /waitloop.sh && chmod a+x /start-dev.sh
+
+# not necessary to expose on k8s and istio
+EXPOSE 8080
+EXPOSE 8085
+EXPOSE 8090
+
 CMD ["/waitloop.sh"]
-
-
-

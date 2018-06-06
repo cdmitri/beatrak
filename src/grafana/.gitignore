@@ -1,1 +1,2 @@
 grafana-svc.yaml
+var-lib-grafana-volume/grafana.db

@@ -5,7 +5,7 @@
  */
 
 
-"use strict";
+// "use strict";
   
 const express = require("express")
 const exec = require("child_process").exec
@@ -16,14 +16,18 @@ const log = require("loglevel")
 const getopt = require("node-getopt")
 const grpc = require("grpc")
 const fs = require("fs")
-const utils = require("../common/utils.js") 
+//const utils = require("../common/utils.js") 
+//../../../common
+const utils = require("../../../common/utils.js") 
 const m = utils.m;
  
 //
 // GLOBAL
 //
 var gl = {}
-const PROTO_PATH = __dirname + "/../../../protos"
+
+// TODO: do a better PROTO_PATH of container vs. regular
+PROTO_PATH = __dirname + "/../../../protos"
 const KEY_PATH = __dirname + "/../../../keys"
 const locpickProto = grpc.load(PROTO_PATH+"/locpick.proto").locpick
  
@@ -44,6 +48,14 @@ gl.config = {
 	{"name" : "sf", "lonlat" : "37.7576948,-122.4726192", "zone" : "zb"},
 	{"name" : "la", "lonlat" : "34.0203996,-118.5518132", "zone" : "zb"},
 	{"name" : "noloc", "zone" : "zb"},
+	{"name" : "tampa", "lonlat" : "27.958634, -82.485188", "zone" : "zfl"},
+	{"name" : "sebastian", "lonlat" : "27.790064, -80.480243", "zone" : "zfl"},
+	{"name" : "orlando", "lonlat" : "28.549820, -81.374843", "zone" : "zfl"},
+	{"name" : "noloc", "zone" : "zfl"},
+	{"name" : "neworleans", "lonlat" : "29.970931, -90.068310", "zone" : "zla"},
+	{"name" : "eads", "lonlat" : "29.015900, -89.167074", "zone" : "zla"},
+	{"name" : "madeville", "lonlat" : "30.359777, -90.065658", "zone" : "zla"},
+	{"name" : "noloc", "zone" : "zla"},
 	{"name" : "noloc", "zone" : "nozone"},
 	{"name" : "devshell1", "lonlat" : "61.0,5.0",  "zone" : "zdevshell"},
 	{"name" : "devshell_last", "lonlat" : "62.0,6.0",  "zone" : "zdevshell"},
@@ -105,7 +117,7 @@ const initEnv = () => {
 
     if(typeof process.env.LOCPICK_GRPC_TLS_PORT === 'undefined' || process.env.LOCPICK_GRPC_TLS_PORT == "") {
 	gl.locpickGrpcTlsPort = 8090
-	console.log("log: locpick.js: initEnv(): LOCPICK_GRPC_TLS_PORT is undefined, gl.locpickGrpcTlsPort = " + gl.locpickGrpcPort)
+	console.log("log: locpick.js: initEnv(): LOCPICK_GRPC_TLS_PORT is undefined, gl.locpickGrpcTlsPort = " + gl.locpickGrpcTlsPort)
     } else {
 	gl.locpickGrpcTlsPort = process.env.LOCPICK_GRPC_TLS_PORT
 	console.log("log: locpick.js: initEnv(): gl.locpickGrpcTlsPort = " + gl.locpickGrpcTlsPort)

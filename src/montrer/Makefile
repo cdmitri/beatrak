@@ -2,11 +2,18 @@ export SERVICE_NAME=montrer-envoy-dep-svc
 export APP=${SERVICE_NAME}
 
 env:
+ifndef HOSTNAME
+	$(eval export HOSTNAME=$(shell hostname))
+	@echo "HOSTNAME="${HOSTNAME}
+endif
+
 ifndef ROOT_SRC_DIR
-	$(eval ROOT_SRC_DIR=$(abspath ${PWD}/..))
+	$(eval ROOT_SRC_DIR=$(abspath ${PWD}/../..))
 	@echo "ROOT_SRC_DIR="${ROOT_SRC_DIR}
 endif
 	$(eval export NODE_PATH=/usr/lib/node_modules)
+	@echo "NODE_PATH="${NODE_PATH}
+
 ifndef TARGET
 TARGET = devshell
 endif
@@ -94,10 +101,9 @@ k8s-create-devshell: REPLICAS=1
 k8s-create-devshell: LOG_LEVEL=debug
 k8s-create-devshell: SERVICE_NAME=montrer-devshell-ss-hlsvc
 k8s-create-devshell: APP=${SERVICE_NAME}
-k8s-create-devshell: APP_VOLUME_PATH=${ROOT_SRC_DIR}/montrer/montrer-svc/app
-k8s-create-devshell: COMMON_VOLUME_PATH=${ROOT_SRC_DIR}/common
+k8s-create-devshell: BEATRAK_VOLUME_PATH=${ROOT_SRC_DIR}
 k8s-create-devshell: 
-	${ROOT_SRC_DIR}/tools/templ.js --templ=${SERVICE_NAME}.templ.yaml --data='{ "service-name" : "$(SERVICE_NAME)", "app" : "${APP}", "zone" : "${ZONE}", "cluster" : "$(CLUSTER)", "log-level" : "$(LOG_LEVEL)", "replicas" : "${REPLICAS}", "hostname" : "${NODE}", "app-volume-path" : "${APP_VOLUME_PATH}", "common-volume-path" : "${COMMON_VOLUME_PATH}" }' --file=${SERVICE_NAME}.yaml
+	${ROOT_SRC_DIR}/tools/templ.js --templ=${SERVICE_NAME}.templ.yaml --data='{ "service-name" : "$(SERVICE_NAME)", "app" : "${APP}", "zone" : "${ZONE}", "cluster" : "$(CLUSTER)", "log-level" : "$(LOG_LEVEL)", "replicas" : "${REPLICAS}", "hostname" : "${NODE}", "beatrak-volume-path" : "${BEATRAK_VOLUME_PATH}" }' --file=${SERVICE_NAME}.yaml
 	kubectl create -f ./${SERVICE_NAME}.yaml
 
 k8s-delete-devshell: SERVICE_NAME=montrer-devshell-ss-hlsvc
