@@ -326,7 +326,7 @@ grafana-installgen: env
 	$(MAKE) -C ${ROOT_SRC_DIR}/src/grafana k8s-installgen
 
 #
-# POSTGRES
+# POSTGRESQL
 #
 
 postgresql-build:

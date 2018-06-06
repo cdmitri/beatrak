@@ -48,7 +48,11 @@ shell-envoy: banner k8s-shell-envoy-${TARGET}
 #
 k8s-build-prod:
 	mkdir -p ./stage1-msvc/common/
+	mkdir -p ./stage1-msvc/protos/
+	mkdir -p ./stage1-msvc/keys/
 	cp -rf ../common/* ./stage1-msvc/common/
+	cp -rf ../protos/* ./stage1-msvc/protos/
+	cp -rf ../protos/* ./stage1-msvc/keys/
 	$(MAKE) -C ./stage1-msvc k8s-build
 	$(MAKE) -C ./stage1-envoy k8s-build
 

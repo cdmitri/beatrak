@@ -18,7 +18,7 @@ const TrafficMarkerStyle  = {
     position: "absolute",
     color: "black",
     background: "white",
-    opacity: 0.5,
+    opacity: 0.8,
     border: "2px solid green",
     textAlign: "center",
     height: H_SIZE,

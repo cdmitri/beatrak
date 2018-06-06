@@ -58,7 +58,7 @@ class App extends React.Component {
 	return (
 		<div className="App">
 		  <header className="App-header">
-		    <h1 className="App-title">DEVSHELL</h1>
+		    <h1 className="App-title">beatrak-dev</h1>
 		  </header>
 		  <div>
 		    <SignalTable signals={this.state.signals} verbose={this.state.verbose}/>
