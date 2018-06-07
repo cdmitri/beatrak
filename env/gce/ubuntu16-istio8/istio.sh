@@ -8,7 +8,16 @@ if [[ "$(stioctl version)" != *"Version"* ]]; then
     curl -L https://git.io/getLatestIstio | ISTIO_VERSION=0.8.0 sh -
     export PATH="$PATH:/usr/local/src/istio-0.8.0/bin"
     cd istio-0.8.0
-    kubectl apply -f install/kubernetes/istio.yaml
+    kubectl apply -f install/kubernetes/istio-demo.yaml
+
+
+#    kubectl apply -f install/kubernetes/istio.yaml
+#    /Users/dchtchou/test-cluster/src/istio-0.8.0
+#
+#kubectl create -f install/kubernetes/istio-demo.yaml
+#
+# ERROR: Error from server (AlreadyExists): error when creating "install/kubernetes/istio-demo.yaml": namespaces "istio-system" already exists, that's ok
+# [~/test-cluster/src/istio-0.8.0]$ kubectl get pods --all-namespaces -n istio-system
 
     #
     # should be this below

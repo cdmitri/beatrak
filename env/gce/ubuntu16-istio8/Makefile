@@ -11,8 +11,13 @@ setup:
 setup-user:
 	sudo bash -c "bash ./vm-user.sh cdmitri"
 
+setup-extra:
+	sudo bash -c "bash ./extra.sh"
+
 setup-istio:
 	sudo bash -c "bash istio.sh cdmitri"
+	kubectl label namespace default istio-injection=enabled
+
 
 #stop:
 #	vagrant halt
