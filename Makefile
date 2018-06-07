@@ -214,11 +214,13 @@ stage1-build:
 	$(MAKE) -C ${ROOT_SRC_DIR}/src/stage1 build
 
 stage1-create:
-	kubectl create -f src/stage1/rr/work-08-clus/stage1-service.yaml
+	kubectl create -f src/stage1/routes/work-02/stage1-service.yaml
 
 stage1-delete:
-	kubectl delete -f src/stage1/rr/work-08-clus/stage1-service.yaml
+	kubectl delete -f src/stage1/routes/work-02/stage1-service.yaml
 
+services-delete:
+	kubectl delete -f src/stage1/routes/work-02/stage1-service.yaml
 
 ###-----------------------------------------------------------------------------
 ### CLUS
@@ -228,23 +230,62 @@ stage1-delete:
 show:
 	kubectl get pods -Lapp,version,cluster,zone  --watch | grep clus-istio
 
-rr-show:
-	kubectl get routerules
+services-create:
+	kubectl create -f src/stage1/routes/work-02/stage1-service.yaml
 
-rr-delete:
-	kubectl delete routerules beacon-to-service
+routes-show:
+	kubectl get virtualservices
+	kubectl get destinationrules
 
-rr-create-1-prem-50-50:
-	kubectl create -f src/stage1/rr/work-08-clus/rr-prem-50-50.yaml
+routes-delete-all:
+	kubectl delete virtualservices --all
+	kubectl delete destinationrules --all
 
-rr-create-2-prem-1-only:
-	kubectl replace -f src/stage1/rr/work-08-clus/rr-prem-1-only.yaml
+#
+# DEMO
+#
+# make services-create
+# make routes-create-orlando-50p-50p
+# make off-orlando-2
+# make routes-create-orlando-1-100p
+# make routes-create-cloud-canary-10p
 
-rr-create-3-cloud-10-canary:
-	kubectl replace -f src/stage1/rr/work-08-clus/rr-cloud-10-canary.yaml
 
-rr-create-4-cloud-prem-50-50:
-	kubectl replace -f src/stage1/rr/work-08-clus/rr-cloud-prem-50-50.yaml
+routes-create-orlando-50p-50p:
+	kubectl create -f src/stage1/routes/work-02/vs-dr-orlando-50p-50p.yaml
+
+off-orlando-2:
+	kubectl delete deployment orlando-service-2
+
+# todo: 100:0 vs 99:1
+routes-create-orlando-1-100p:
+	kubectl replace -f src/stage1/routes/work-02/vs-dr-orlando-1-100p.yaml
+
+routes-create-cloud-canary-10p:
+	kubectl replace -f src/stage1/routes/work-02/vs-dr-cloud-canary-10p.yaml
+
+# todo: does not like destination.weight:0
+routes-create-cloud-orlando-50p-50p:
+	kubectl replace -f src/stage1/routes/work-02/vs-dr-cloud-orlando-50p-50p.yaml
+
+
+#rr-show:
+#	kubectl get routerules
+#
+#rr-delete:
+#	kubectl delete routerules beacon-to-service
+#
+#rr-create-1-prem-50-50:
+#	kubectl create -f src/stage1/rr/work-08-clus/rr-prem-50-50.yaml
+#
+#rr-create-2-prem-1-only:
+#	kubectl replace -f src/stage1/rr/work-08-clus/rr-prem-1-only.yaml
+#
+#rr-create-3-cloud-10-canary:
+#	kubectl replace -f src/stage1/rr/work-08-clus/rr-cloud-10-canary.yaml
+#
+#rr-create-4-cloud-prem-50-50:
+#	kubectl replace -f src/stage1/rr/work-08-clus/rr-cloud-prem-50-50.yaml
 
 
 
