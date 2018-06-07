@@ -99,7 +99,7 @@ const initEnv = () => {
     }
 
     if(typeof process.env.LOCPICK_HTTP_HOST === 'undefined' || process.env.LOCPICK_HTTP_HOST == "") {
-	gl.locpickHttpHost = "localhost"
+	gl.locpickHttpHost = "0.0.0.0"
 	console.log("log: locpick.js: initEnv(): LOCPICK_HTTP_HOST is undefined, gl.locpickHttpHost = " + gl.locpickHttpHost)
     } else {
 	gl.locpickHttpHost = process.env.LOCPICK_HTTP_HOST
@@ -124,7 +124,7 @@ const initEnv = () => {
     }
     
     if(typeof process.env.LOCPICK_GRPC_HOST === 'undefined' || process.env.LOCPICK_GRPC_HOST == "") {
-	gl.locpickGrpcHost = "localhost"
+	gl.locpickGrpcHost = "0.0.0.0"
 	console.log("log: locpick.js: initEnv(): LOCPICK_GRPC_HOST is undefined, gl.locpickGrpcHost = " + gl.locpickGrpcHost)
     } else {
 	gl.locpickGrpcHost = process.env.LOCPICK_GRPC_HOST

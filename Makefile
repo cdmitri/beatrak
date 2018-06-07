@@ -6,14 +6,17 @@ export EXT_SVC_NODEPORT :=
 
 # Set EXT_SVC_IP=<IP addr> to generate external services' IP
 #    Ex: "make ... EXT_SVC_IP=10.138.0.21"
-export EXT_SVC_IP := 10.138.0.4
+export EXT_SVC_IP := 10.138.0.5
 
 all:
+
+.PHONY: env
 env: 
 	$(eval export NODE_PATH=$(shell npm get prefix)/lib/node_modules:${ROOT_SRC_DIR}/src/common)
-
+	echo "ENV: NODE_PATH=${NODE_PATH}"
 
 build-all:
+	$(MAKE) keys
 	$(MAKE) node-base-build
 	$(MAKE) common-build
 	$(MAKE) locpick-build
@@ -25,7 +28,7 @@ build-all:
 	$(MAKE) grafana-build
 	$(MAKE) postgresql-build
 
-installgen:
+installgen: env
 	-$(MAKE) elastic-installgen
 	-$(MAKE) postgresql-installgen
 	-$(MAKE) grafana-installgen

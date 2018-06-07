@@ -18,6 +18,16 @@ setup-istio:
 	sudo bash -c "bash istio.sh cdmitri"
 	kubectl label namespace default istio-injection=enabled
 
+setup-prereq:
+	sudo bash -c "echo "vm.max_map_count=262144" >> /etc/sysctl.conf"
+	sudo sysctl -w vm.max_map_count=262144
+	sudo bash -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+	sudo wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+	sudo apt-get update -y
+	sudo apt-get install -y postgresql-client-10
+	sudo chmod a+rwx /usr/lib/node_modules
+	sudo npm install --global handlebars handlebars-intl yargs dotenv
+
 
 #stop:
 #	vagrant halt
