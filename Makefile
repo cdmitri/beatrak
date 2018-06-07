@@ -257,7 +257,7 @@ routes-delete-all:
 # make routes-create-orlando-1-100p
 # make routes-create-cloud-canary-10p
 
-stepX:
+stepx:
 	-@$(MAKE) services-delete
 	-@$(MAKE) routes-delete-all
 
