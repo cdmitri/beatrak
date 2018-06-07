@@ -147,10 +147,11 @@ montrer-installgen: env
 #
 # MONTRER-DEVSHELL
 #
-# cd cd src/montrer
+# cd src/montrer
 # make k8s-build-devshell
 # make k8s-create-devshell
 # make k8s-shell-devshell
+# tail -f logs/react-log.log
 # make k8s-delete-devshell
 #
 
