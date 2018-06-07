@@ -227,6 +227,12 @@ services-delete:
 ### CLUS
 ###-----------------------------------------------------------------------------
 
+testme:
+	kubectl create -f src/stage1/routes/work-02/testme.yaml
+
+reset:
+	$(MAKE) services-delete
+	$(MAKE) routes-delete-all
 
 show:
 	kubectl get pods -Lapp,version,cluster,zone  --watch | grep clus-istio
@@ -251,11 +257,32 @@ routes-delete-all:
 # make routes-create-orlando-1-100p
 # make routes-create-cloud-canary-10p
 
+stepX:
+	-@$(MAKE) services-delete
+	-@$(MAKE) routes-delete-all
+
+step0:
+	-@$(MAKE) services-create
+
+step1:
+	-@$(MAKE) routes-create-orlando-50p-50p
+
+step2:
+	-@$(MAKE) disable-orlando-2
+
+step3:
+	-@$(MAKE) routes-create-orlando-1-100p
+
+step4:
+	-@$(MAKE) routes-create-cloud-canary-10p
+
+step5:
+	-@$(MAKE) routes-create-cloud-orlando-50p-50p
 
 routes-create-orlando-50p-50p:
 	kubectl create -f src/stage1/routes/work-02/vs-dr-orlando-50p-50p.yaml
 
-off-orlando-2:
+disable-orlando-2:
 	kubectl delete deployment orlando-service-2
 
 # todo: 100:0 vs 99:1
@@ -287,6 +314,10 @@ routes-create-cloud-orlando-50p-50p:
 #
 #rr-create-4-cloud-prem-50-50:
 #	kubectl replace -f src/stage1/rr/work-08-clus/rr-cloud-prem-50-50.yaml
+
+
+
+
 
 
 
