@@ -86,8 +86,8 @@ class ClusterTable extends React.Component {
 		    {clusters.map(cluster =>
 			       <tr key={cluster.stage1_cluster + ":" + 10}>
 				     <td>{cluster.stage1_cluster}</td>
-				     <td>{cluster.sp}</td>
-			             <td>{moment(cluster.last_ts).format("YYYY-MM-DD HH:mm:ss")}</td>
+					 <td>{Math.round(cluster.sp/5)*5}</td>
+			             <td>{moment(cluster.last_ts).format("YYYY-MM-DD HH:mm")}</td>
 			       </tr>
 	          )}
 	       </tbody></table>

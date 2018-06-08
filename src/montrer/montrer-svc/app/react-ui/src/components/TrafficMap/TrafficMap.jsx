@@ -198,6 +198,7 @@ class TrafficMap extends React.Component {
 
 	let normalized = clusters.map(cluster => {
 	    cluster.sp = Math.round(cluster.sp / total * 100)
+	    cluster.sp = Math.round(cluster.sp / 5) * 5
 	    return {stage1_cluster: cluster.stage1_cluster, sp: cluster.sp}
 	})
 

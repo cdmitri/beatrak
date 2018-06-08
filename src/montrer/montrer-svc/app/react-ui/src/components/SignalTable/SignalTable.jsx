@@ -77,7 +77,7 @@ class SignalTable extends React.Component {
 					 <td>{signal.stage1_cluster}</td>
 					 <td>{signal.sps}</td>
 				         <td>{signal.sp}</td>
-				         <td>{moment(signal.last_ts).format("YYYY-MM-DD HH:mm:ss")}</td>
+				         <td>{moment(signal.last_ts).format("YYYY-MM-DD HH:mm")}</td>
 			       </tr>
 	          )}
 	       </tbody></table>
@@ -100,8 +100,8 @@ class SignalTable extends React.Component {
 				     {/* <td key={signal.beacon_id + signal.stage_id}>lala</td> */}
 					 <td>{signal.loc.name}</td>
 					 <td>{signal.stage1_cluster}</td>
-				         <td>{signal.sp}</td>
-				         <td>{moment(signal.last_ts).format("YYYY-MM-DD HH:mm:ss")}</td>
+				             <td>{Math.round(signal.sp/5)*5}</td>
+			                 <td>{moment(signal.last_ts).format("YYYY-MM-DD HH:mm")}</td>
 			       </tr>
 	          )}
 	       </tbody></table>

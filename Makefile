@@ -150,7 +150,7 @@ montrer-installgen: env
 # cd src/montrer
 # make k8s-build-devshell
 # make k8s-create-devshell
-# make k8s-shell-devshell
+# make k8s-shell-devshell 
 # tail -f logs/react-log.log
 # make k8s-delete-devshell
 #
@@ -256,8 +256,7 @@ routes-delete-all:
 # make off-orlando-2
 # make routes-create-orlando-1-100p
 # make routes-create-cloud-canary-10p
-
-stepX:
+stepx:
 	-@$(MAKE) services-delete
 	-@$(MAKE) routes-delete-all
 
