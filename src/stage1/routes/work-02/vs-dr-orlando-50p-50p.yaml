@@ -29,5 +29,3 @@ spec:
   - name: orlando-service-2
     labels:
       cluster: orlando-service-2
-
-
